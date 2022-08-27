@@ -1,0 +1,16 @@
+{
+    "Data": [
+        {
+            "name": "神秘魔法書",
+            "description": "記錄了神秘魔法的書，看起來相當古老。",
+            "index": "Book_001",
+            "spriteAddress": "Assets/RPG_inventory_icons/book.PNG"
+        },
+        {
+            "name": "毒蘋果",
+            "description": "塗了毒藥的紅蘋果，傳說是巫婆的傑作。",
+            "index": "Food_001",
+            "spriteAddress": "Assets/RPG_inventory_icons/apple.png"
+        }
+    ]
+}
