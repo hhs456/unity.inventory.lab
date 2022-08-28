@@ -29,14 +29,14 @@ namespace ToolKid.InventorySystem {
 
         private Dictionary<string, LinkedList<Slot>> Slots { get; set; }
 
-        public void AddNewItem(Item item) {
+        public void AddNewItem(ItemProps item) {
             LinkedList<Slot> slots = new LinkedList<Slot>();            
             LinkedListNode<Slot> slot = new LinkedListNode<Slot>(new Slot(item));
             slots.AddLast(slot);
             Slots.Add(item.Index, slots);
         }
 
-        public void AddSlotStack(Item item, int count) {
+        public void AddSlotStack(ItemProps item, int count) {
             Slots.TryGetValue(item.Index, out LinkedList<Slot> slots);
             LinkedListNode<Slot> slotNode = slots.First;           
             AddSlotStack(slotNode, count);
@@ -60,33 +60,44 @@ namespace ToolKid.InventorySystem {
     public class Slot {
 
         [SerializeField]
-        private Item item;
-        public Item Item { get => item; }
+        private ItemProps item;
+        public ItemProps Item { get => item; }
 
         [SerializeField] private int stackLimit;
         public int StackLimit { get => stackLimit; }
 
         [SerializeField] private int stackCount;
-        public int StackCount { get => stackCount;}
+        public int StackCount { get => stackCount; set => stackCount = value; }
 
-        [SerializeField] private int slotIndex;
+
+        #region # Inventory Informations
+
+        [SerializeField]
+        private int inventoryIndex;
+        public int InventoryIndex { get => inventoryIndex; }
+
+        [SerializeField]
+        private int slotIndex;
         public int SlotIndex { get => slotIndex; }
 
-        [SerializeField] private int addedIndex;
+        [SerializeField]
+        private int addedIndex;
         public int AddedIndex { get => addedIndex; }
+
+        #endregion
 
         public Slot() {
             item = null;
         }
 
-        public Slot (Item item) {
+        public Slot (ItemProps item) {
             this.item = item;            
         }
-        public Slot(Slot slot) {
+        public Slot(Slot slot, int index) {
             item = slot.item;
             stackLimit = slot.stackLimit;
             stackCount = slot.stackCount;
-            slotIndex = slot.slotIndex;
+            slotIndex = index;
             addedIndex = slot.addedIndex;
         }
 
@@ -107,34 +118,18 @@ namespace ToolKid.InventorySystem {
             }
         }
         
-        public void SetPropsFrom(Slot slot) {
+        public void RelocateItemFrom(Slot slot) {
             item = slot.item;
             stackLimit = slot.stackLimit;
-            stackCount = slot.stackCount;
-            slotIndex = slot.slotIndex;
+            stackCount = slot.stackCount;            
             addedIndex = slot.addedIndex;
         }
 
-    }
-    [System.Serializable]
-    public class Item {
-
-        [SerializeField]
-        private string name;
-        public string Name { get => name; }
-
-        [SerializeField]
-        private string description;
-        public string Description { get => description; }
-
-        [SerializeField]
-        private string index;
-        public string Index { get => index; }
-
-        [SerializeField]
-        private string spriteAddress;
-        
-        public string SpriteAddress { get => spriteAddress; set => spriteAddress = value; }
-        
+        public void Clear() {
+            item.Clear();
+            stackLimit = 0;
+            stackCount = 0;
+            addedIndex = 0;
+        }
     }
 }

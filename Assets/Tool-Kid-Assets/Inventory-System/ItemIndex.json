@@ -11,6 +11,30 @@
             "description": "塗了毒藥的紅蘋果，傳說是巫婆的傑作。",
             "index": "Food_001",
             "spriteAddress": "Assets/RPG_inventory_icons/apple.png"
+        },
+        {
+            "name": "斷掉的劍",
+            "description": "斷口猶新的劍，不知道主人是誰。",
+            "index": "Weapon_001",
+            "spriteAddress": "Assets/RPG_inventory_icons/sword.png"
+        },
+        {
+            "name": "秘銀",
+            "description": "一種稀有的魔法材料。",
+            "index": "Material_001",
+            "spriteAddress": "Assets/RPG_inventory_icons/ingots.png"
+        },
+        {
+            "name": "歸途卷軸",
+            "description": "使用後可以直接回到卷軸記錄的座標。",
+            "index": "Book_002",
+            "spriteAddress": "Assets/RPG_inventory_icons/scroll.png"
+        },
+        {
+            "name": "金戒指",
+            "description": "在地下城撿到的戒指，似乎有著神祕的力量。",
+            "index": "Ring_001",
+            "spriteAddress": "Assets/RPG_inventory_icons/rings.PNG"
         }
     ]
 }

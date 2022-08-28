@@ -31,7 +31,7 @@ namespace ToolKid.InventorySystem {
         }
 
         public void LoadData() {
-            JsonUtility.FromJson<Item[]>(script.dataBase.text);
+            JsonUtility.FromJson<ItemProps[]>(script.dataBase.text);
         }
     }
 }

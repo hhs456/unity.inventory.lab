@@ -14,7 +14,9 @@ namespace ToolKid.InventorySystem {
             }
         }
 
-        public bool enable = false;
+        private SlotBase[] slotBases;
+        public bool defaultEnable = false;
+        private bool enable = false;
         [SerializeField]
         private Vector2 lastPosition;
         [SerializeField]
@@ -27,6 +29,9 @@ namespace ToolKid.InventorySystem {
 
         void Awake() {
             Timer.CentiSecond += DspUpdate;
+            slotBases = transform.GetComponentsInChildren<SlotBase>();
+            enable = !defaultEnable;
+            Switch();
         }
 
         private void DspUpdate(object sender, Watch e) {

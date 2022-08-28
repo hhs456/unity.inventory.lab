@@ -26,6 +26,6 @@ namespace ToolKid.InventorySystem {
     [System.Serializable]
     public class ItemArray {
         [SerializeField]
-        public Item[] Data;
+        public ItemProps[] Data;
     }
 }
