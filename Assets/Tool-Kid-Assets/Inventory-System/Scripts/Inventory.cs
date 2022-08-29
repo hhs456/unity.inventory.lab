@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -59,6 +60,8 @@ namespace ToolKid.InventorySystem {
     [System.Serializable]
     public class Slot {
 
+        public event EventHandler SlotUpdate;
+
         [SerializeField]
         private ItemProps item;
         public ItemProps Item { get => item; }
@@ -67,7 +70,13 @@ namespace ToolKid.InventorySystem {
         public int StackLimit { get => stackLimit; }
 
         [SerializeField] private int stackCount;
-        public int StackCount { get => stackCount; set => stackCount = value; }
+        public int StackCount {
+            get => stackCount;
+            set {
+                stackCount = value;
+                SlotUpdate?.Invoke(this, new EventArgs());
+            }
+        }
 
 
         #region # Inventory Informations
@@ -88,10 +97,12 @@ namespace ToolKid.InventorySystem {
 
         public Slot() {
             item = null;
+            SlotUpdate?.Invoke(this, new EventArgs());
         }
 
         public Slot (ItemProps item) {
-            this.item = item;            
+            this.item = item;
+            SlotUpdate?.Invoke(this, new EventArgs());
         }
         public Slot(Slot slot, int index) {
             item = slot.item;
@@ -99,14 +110,19 @@ namespace ToolKid.InventorySystem {
             stackCount = slot.stackCount;
             slotIndex = index;
             addedIndex = slot.addedIndex;
+            SlotUpdate?.Invoke(this, new EventArgs());
         }
 
         public int Add(int count) {
+            if(stackCount == stackLimit) {
+                return count;
+            }
             stackCount += count;
             int overload = stackCount - stackLimit;
             if (overload > 0) {
                 stackCount = stackLimit;
             }
+            SlotUpdate?.Invoke(this, new EventArgs());
             return overload;
         }
         public void Remove(int count) {
@@ -116,6 +132,7 @@ namespace ToolKid.InventorySystem {
             else {
                 stackCount -= count;
             }
+            SlotUpdate?.Invoke(this, new EventArgs());
         }
         
         public void RelocateItemFrom(Slot slot) {
@@ -123,6 +140,7 @@ namespace ToolKid.InventorySystem {
             stackLimit = slot.stackLimit;
             stackCount = slot.stackCount;            
             addedIndex = slot.addedIndex;
+            //SlotUpdate?.Invoke(this, new EventArgs());
         }
 
         public void Clear() {
@@ -130,6 +148,7 @@ namespace ToolKid.InventorySystem {
             stackLimit = 0;
             stackCount = 0;
             addedIndex = 0;
+            SlotUpdate?.Invoke(this, new EventArgs());
         }
     }
 }

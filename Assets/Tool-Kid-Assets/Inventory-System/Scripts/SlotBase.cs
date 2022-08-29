@@ -29,7 +29,7 @@ namespace ToolKid.InventorySystem {
 
         private bool isDescribing = false;
         private bool isHovering = false;
-        private bool isDragging = false;
+        //private bool isDragging = false;
         private bool isValidDrop = false;        
 
         public float StopWatch { get => stopWatch; set => stopWatch = value; }
@@ -49,8 +49,14 @@ namespace ToolKid.InventorySystem {
 
         void Awake() {
             ModifyTo(props);
+            props.SlotUpdate += SlotUpdate;
             Timer.CentiSecond += Counterdown;            
         }
+
+        private void SlotUpdate(object sender, EventArgs e) {
+            ModifyTo(props);            
+        }
+
         /// <summary>
         /// Modify SlotBase's properties to be same as target's properties.
         /// </summary>
@@ -72,7 +78,8 @@ namespace ToolKid.InventorySystem {
                 LoadDataFrom(null);
                 nameText.text = "";
                 stackCount.text = "";
-            }            
+            }
+            Debug.Log("Modify " + this, this);
         }
 
         public void OnPointerEnter(PointerEventData eventData) {
@@ -86,7 +93,7 @@ namespace ToolKid.InventorySystem {
             if (isHovering) {
                 // if pointer hovers on slot ...                
                 stopWatch += 0.01f;
-                if (stopWatch >= describeHoverTime && !isDescribing && !isDragging && props.Item.Name != "") {
+                if (stopWatch >= describeHoverTime && !isDescribing && !dragging && props.Item.Name != "") {
                     isDescribing = true;
                     Describe?.Invoke(this, props);
                 }
@@ -104,19 +111,22 @@ namespace ToolKid.InventorySystem {
         }
 
         private void Clear() {
+            Debug.Log("Clear " + this, this);
             if (props.Item != null) {
                 Addressables.LoadAssetAsync<Sprite>(props.Item.SpriteAddress).Completed -= OnAssetObjLoaded;
             }
-            props.Clear();
-            ModifyTo(null);
-            Debug.Log("Clear " + this, this);
+            props.Clear();                       
         }
 
-        public void OnDrop(PointerEventData eventData) {
-            Debug.Log("Drop On " + this, this);
-            
+        public void OnDrop(PointerEventData eventData) {            
+           
             InventoryBase dragFrom = eventData.pointerDrag.GetComponentInParent<InventoryBase>();
             SlotBase dragSlot = eventData.pointerDrag.GetComponent<SlotBase>();
+
+            if (!dragSlot.dragging) {
+                return;
+            }
+            Debug.Log("Drop To " + this, this);
             SlotBase dropSlot = this;
 
             dragSlot.isValidDrop = true;
@@ -127,26 +137,22 @@ namespace ToolKid.InventorySystem {
                         Slot temp = new Slot(dragSlot.props, dragSlot.index);
                         dragSlot.ModifyTo(dropSlot.props);
                         dropSlot.ModifyTo(temp);
-                        Debug.Log("Exchange Slot Index " + dragSlot.index + " And Index " + index, this);
+                        Debug.Log("Finish Exchanging", this);
                     }
                     else {
+                        Debug.Log("Stack To " + this, this);
                         int overStack = dropSlot.props.Add(dragSlot.props.StackCount);
                         if (overStack == dragSlot.props.StackCount) {
+                            // exchange slot stack count
                             dragSlot.props.StackCount = dropSlot.props.StackCount;
-                            dropSlot.props.StackCount = overStack;
-                            dragSlot.ModifyTo(dragSlot.props);
-                            dropSlot.ModifyTo(dropSlot.props);
+                            dropSlot.props.StackCount = overStack;                            
                         }
                         else {
-                            dragSlot.props.StackCount = overStack;
-                            dropSlot.ModifyTo(dropSlot.props);
-                            if (dragSlot.props.StackCount > 0) {
-                                dragSlot.ModifyTo(dragSlot.props);
-                            }
-                            else {
+                            dragSlot.props.StackCount = overStack;                            
+                            if (dragSlot.props.StackCount < 1) {
+                                // slot get into empty
                                 dragSlot.Clear();
-                            }
-                            Debug.Log("Stack " + props.Item.Index, this);
+                            }                            
                         }
                     }
                 }
@@ -157,33 +163,39 @@ namespace ToolKid.InventorySystem {
             }
         }
 
-        public void DropOutside() {
-            Debug.Log("Drop Outside", this);
+        public void InvalidDrop() {
+            Debug.Log("Invalid Drop From " + this, this);
         }
 
-        public void OnDrag(PointerEventData eventData) {            
-            dragging.transform.position = eventData.position;            
+        public void OnDrag(PointerEventData eventData) {
+            if (dragging) {
+                dragging.transform.position = eventData.position;
+            }
         }
 
-        public void OnBeginDrag(PointerEventData eventData) {
-            Debug.Log("Begin Drag", this);
+        public void OnBeginDrag(PointerEventData eventData) {            
             isValidDrop = false;
             if (isDescribing) {
                 isDescribing = false;
                 Undescribe?.Invoke(this, props);
                 //OnUndescribe();
             }
-            isDragging = true;
-            dragging = Instantiate(itemImage, transform.parent);
-            dragging.raycastTarget = false;
+            if (props.Item.Name != "") {
+                //isDragging = true;
+                dragging = Instantiate(itemImage, transform.parent);
+                dragging.raycastTarget = false;
+                Debug.Log("Valid Drag From " + props.Item.Index, this);
+            }
         }
 
         public void OnEndDrag(PointerEventData eventData) {
-            isDragging = false;
+            //isDragging = false;
             if (!isValidDrop) {
-                DropOutside();
+                InvalidDrop();
             }
-            Destroy(dragging.gameObject);            
+            if (dragging) {
+                Destroy(dragging.gameObject);
+            }
         }
 
         public void LoadDataFrom(string address) {

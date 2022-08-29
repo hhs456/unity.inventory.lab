@@ -11,6 +11,8 @@ using UnityEngine.UI;
 namespace ToolKid.InventorySystem {
     public class Describer : MonoBehaviour {
 
+        public bool enableLog = false;
+
         private SlotBase slotBase;
 
         private bool isDescribing = false;        
@@ -40,17 +42,19 @@ namespace ToolKid.InventorySystem {
         private void OnDescribe(object sender, Slot e) {            
             onDescribe.Invoke();
             isDescribing = true;
+            informationPanel.position = Input.mousePosition;
+            informationPanel.GetComponentInChildren<Text>().text = slotBase.Props.Item.Description;            
             informationPanel.gameObject.SetActive(isDescribing);
-            informationPanel.GetComponentInChildren<Text>().text = slotBase.Props.Item.Description;
-            Debug.Log("Describe " + slotBase.Props.Item.Index, this);
+            TKLog.Log("Describe " + slotBase.Props.Item.Index, this, enableLog);
         }
 
         private void OnUndescribe(object sender, Slot e) {            
             onUndescribe.Invoke();
-            informationPanel.GetComponentInChildren<Text>().text = "It is expect on undescribe";
             isDescribing = false;
+            informationPanel.position = Input.mousePosition;
+            informationPanel.GetComponentInChildren<Text>().text = "It is expect on undescribe";            
             informationPanel.gameObject.SetActive(isDescribing);
-            Debug.Log("Undescribe " + slotBase.Props.Item.Index, this);
+            TKLog.Log("Undescribe " + slotBase.Props.Item.Index, this, enableLog);
         }
     }
 }
