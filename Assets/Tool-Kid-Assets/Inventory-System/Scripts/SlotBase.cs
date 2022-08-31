@@ -158,7 +158,7 @@ namespace ToolKid.InventorySystem {
                 }
                 else {
                     dropSlot.ModifyTo(dragSlot.props);                    
-                    dragSlot.Clear();
+                    dragSlot.Clear();                    
                 }
             }
         }

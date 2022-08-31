@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace ToolKid.InventorySystem {
         }
 
         private SlotBase[] slotBases;
+        public SlotBase[] SlotBases { get => slotBases; }
         public bool defaultEnable = false;
         private bool enable = false;
         [SerializeField]
@@ -27,11 +29,14 @@ namespace ToolKid.InventorySystem {
             get => keyCode;
         }
 
+        public event EventHandler EndInit;
+
         void Awake() {
             Timer.CentiSecond += DspUpdate;
             slotBases = transform.GetComponentsInChildren<SlotBase>();
             enable = !defaultEnable;
             Switch();
+            EndInit?.Invoke(this, new EventArgs());
         }
 
         private void DspUpdate(object sender, Watch e) {

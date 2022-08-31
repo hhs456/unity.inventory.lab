@@ -166,7 +166,6 @@ GameObject:
   - component: {fileID: 5882042920902853333}
   - component: {fileID: 5882042920902853332}
   - component: {fileID: 5147025316244387487}
-  - component: {fileID: 5890766784451416382}
   m_Layer: 5
   m_Name: Slot
   m_TagString: Untagged
@@ -251,6 +250,7 @@ MonoBehaviour:
       name: 
       description: 
       index: 0
+      price: 0
       spriteAddress: 
     stackLimit: 0
     stackCount: 0
@@ -264,31 +264,6 @@ MonoBehaviour:
   emptyIconAddress: Assets/RPG_inventory_icons/f.PNG
   stopWatch: 0
   describeHoverTime: 0.01
-  onDescribe:
-    m_PersistentCalls:
-      m_Calls: []
-  onUndescribe:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &5890766784451416382
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5882042920902853334}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d15ab5b55059ba746a63f43634d58411, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  informationPanel: {fileID: 0}
-  onDescribe:
-    m_PersistentCalls:
-      m_Calls: []
-  onUndescribe:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &5882042921720346890
 GameObject:
   m_ObjectHideFlags: 0

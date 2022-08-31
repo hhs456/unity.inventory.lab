@@ -25,6 +25,14 @@ namespace ToolKid.InventorySystem {
         public string Index { get => index; }
 
         [SerializeField]
+        private int price;
+        public int Price { get => price; }
+
+        [SerializeField]
+        private string[] tag;
+        public string[] Tag { get => tag; }
+
+        [SerializeField]
         private string spriteAddress;
 
         public string SpriteAddress { get => spriteAddress; }
@@ -33,6 +41,7 @@ namespace ToolKid.InventorySystem {
             name = "";
             description = "";
             index = "";
+            price = 0;
             spriteAddress = "Assets/RPG_inventory_icons/f.PNG";
         }
 
@@ -44,6 +53,7 @@ namespace ToolKid.InventorySystem {
             name = itemProps.name;
             description = itemProps.description;
             index = itemProps.index;
+            price = itemProps.price;
             spriteAddress = itemProps.spriteAddress;
         }
     }

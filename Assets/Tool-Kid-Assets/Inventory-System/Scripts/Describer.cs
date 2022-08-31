@@ -13,12 +13,16 @@ namespace ToolKid.InventorySystem {
 
         public bool enableLog = false;
 
-        private SlotBase slotBase;
+        private InventoryBase Base;
 
         private bool isDescribing = false;        
 
         public RectTransform informationPanel;
         //public GameObject InformationPanel;
+
+        public Text description;
+        public Text count;
+        public Text price;
 
         [HideInInspector]
         public UnityEvent onDescribe;
@@ -28,9 +32,15 @@ namespace ToolKid.InventorySystem {
 
         void Awake() {
             Timer.CentiSecond += Counterdown;
-            slotBase = GetComponent<SlotBase>();
-            slotBase.Describe += OnDescribe;
-            slotBase.Undescribe += OnUndescribe;         
+            Base = GetComponent<InventoryBase>();
+            Base.EndInit += Init;            
+        }
+
+        private void Init(object sender, EventArgs e) {
+            for (int i = 0; i < Base.SlotBases.Length; i++) {
+                Base.SlotBases[i].Describe += OnDescribe;
+                Base.SlotBases[i].Undescribe += OnUndescribe;
+            }
         }
 
         private void Counterdown(object sender, Watch e) {            
@@ -43,18 +53,20 @@ namespace ToolKid.InventorySystem {
             onDescribe.Invoke();
             isDescribing = true;
             informationPanel.position = Input.mousePosition;
-            informationPanel.GetComponentInChildren<Text>().text = slotBase.Props.Item.Description;            
+            description.text = e.Item.Description;
+            count.text = e.StackCount.ToString("000");
+            price.text = e.Item.Price.ToString("000");
             informationPanel.gameObject.SetActive(isDescribing);
-            TKLog.Log("Describe " + slotBase.Props.Item.Index, this, enableLog);
+            TKLog.Log("Describe " + e.Item.Index, this, enableLog);
         }
 
         private void OnUndescribe(object sender, Slot e) {            
             onUndescribe.Invoke();
             isDescribing = false;
             informationPanel.position = Input.mousePosition;
-            informationPanel.GetComponentInChildren<Text>().text = "It is expect on undescribe";            
+            description.text = "It is expect on undescribe";            
             informationPanel.gameObject.SetActive(isDescribing);
-            TKLog.Log("Undescribe " + slotBase.Props.Item.Index, this, enableLog);
+            TKLog.Log("Undescribe " + e.Item.Index, this, enableLog);
         }
     }
 }
