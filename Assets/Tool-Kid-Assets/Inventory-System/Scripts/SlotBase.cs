@@ -10,6 +10,8 @@ using UnityEngine.UI;
 
 namespace ToolKid.InventorySystem {
     public class SlotBase : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDragHandler, IBeginDragHandler, IEndDragHandler, IDropHandler {
+
+        public bool enableLog = false;
         [SerializeField]
         private Slot props;
         public Slot Props { get => props; }
@@ -42,6 +44,8 @@ namespace ToolKid.InventorySystem {
 
         public event EventHandler<Slot> Describe;
         public event EventHandler<Slot> Undescribe;
+
+        public event EventHandler<Slot> Abandon;
 
         void OnValidate() {
             index = transform.GetSiblingIndex();
@@ -79,7 +83,7 @@ namespace ToolKid.InventorySystem {
                 nameText.text = "";
                 stackCount.text = "";
             }
-            Debug.Log("Modify " + this, this);
+            TKLog.Log("Modify " + this, this, enableLog);            
         }
 
         public void OnPointerEnter(PointerEventData eventData) {
@@ -111,60 +115,56 @@ namespace ToolKid.InventorySystem {
         }
 
         private void Clear() {
-            Debug.Log("Clear " + this, this);
+            TKLog.Log("Clear " + this, this, enableLog);            
             if (props.Item != null) {
                 Addressables.LoadAssetAsync<Sprite>(props.Item.SpriteAddress).Completed -= OnAssetObjLoaded;
             }
             props.Clear();                       
         }
 
-        public void OnDrop(PointerEventData eventData) {            
-           
+        public void OnDrop(PointerEventData eventData) {
+
             InventoryBase dragFrom = eventData.pointerDrag.GetComponentInParent<InventoryBase>();
             SlotBase dragSlot = eventData.pointerDrag.GetComponent<SlotBase>();
 
             if (!dragSlot.dragging) {
                 return;
             }
-            Debug.Log("Drop To " + this, this);
+            TKLog.Log("Drop To " + this, this, enableLog);
             SlotBase dropSlot = this;
 
             dragSlot.isValidDrop = true;
-            dragSlot.itemImage.transform.localPosition = Vector3.zero;            
-            if (dropSlot != dragSlot) {                
-                if (dropSlot.props.Item != null) {
-                    if (dropSlot.props.Item.Index != dragSlot.props.Item.Index) {
-                        Slot temp = new Slot(dragSlot.props, dragSlot.index);
-                        dragSlot.ModifyTo(dropSlot.props);
-                        dropSlot.ModifyTo(temp);
-                        Debug.Log("Finish Exchanging", this);
-                    }
-                    else {
-                        Debug.Log("Stack To " + this, this);
-                        int overStack = dropSlot.props.Add(dragSlot.props.StackCount);
-                        if (overStack == dragSlot.props.StackCount) {
-                            // exchange slot stack count
-                            dragSlot.props.StackCount = dropSlot.props.StackCount;
-                            dropSlot.props.StackCount = overStack;                            
-                        }
-                        else {
-                            dragSlot.props.StackCount = overStack;                            
-                            if (dragSlot.props.StackCount < 1) {
-                                // slot get into empty
-                                dragSlot.Clear();
-                            }                            
-                        }
-                    }
-                }
+            dragSlot.itemImage.transform.localPosition = Vector3.zero;
+
+            if (dropSlot == dragSlot) {
+                return;
+            }
+
+            if (dropSlot.props.Item.Index != dragSlot.props.Item.Index) {
+                Slot temp = new Slot(dragSlot.props, dragSlot.index);
+                dragSlot.ModifyTo(dropSlot.props);
+                dropSlot.ModifyTo(temp);
+                TKLog.Log("Finish Exchanging", this, enableLog);
+            }
+            else {
+                TKLog.Log("Stack To " + this, this, enableLog);
+                int overStack = dropSlot.props.Add(dragSlot.props.StackCount);
+                
+                if (overStack == dragSlot.props.StackCount) {
+                    // exchange slot stack count
+                    dragSlot.props.StackCount = dropSlot.props.StackCount;
+                    dropSlot.props.StackCount = overStack;
+                }                
                 else {
-                    dropSlot.ModifyTo(dragSlot.props);                    
-                    dragSlot.Clear();                    
+                    // calculate drag slot count
+                    dragSlot.props.StackCount = overStack;                    
                 }
             }
         }
-
         public void InvalidDrop() {
-            Debug.Log("Invalid Drop From " + this, this);
+            TKLog.Log("Abandon " + props.Item.Index + " From " + this, this, enableLog);
+            Abandon?.Invoke(this, props);
+            props.Clear();
         }
 
         public void OnDrag(PointerEventData eventData) {
@@ -183,8 +183,8 @@ namespace ToolKid.InventorySystem {
             if (props.Item.Name != "") {
                 //isDragging = true;
                 dragging = Instantiate(itemImage, transform.parent);
-                dragging.raycastTarget = false;
-                Debug.Log("Valid Drag From " + props.Item.Index, this);
+                dragging.raycastTarget = false;                
+                TKLog.Log("Valid Drag From " + props.Item.Index, this, enableLog);
             }
         }
 

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace ToolKid.InventorySystem {
     public class InventoryBase : MonoBehaviour {
+
+        public bool enableLog = false;
         [SerializeField]
         private Inventory props;
         public Inventory Props {
@@ -29,6 +31,9 @@ namespace ToolKid.InventorySystem {
             get => keyCode;
         }
 
+        private bool hasInitialized = false;
+        public bool HasInitialized { get => hasInitialized; }
+
         public event EventHandler EndInit;
 
         void Awake() {
@@ -36,7 +41,8 @@ namespace ToolKid.InventorySystem {
             slotBases = transform.GetComponentsInChildren<SlotBase>();
             enable = !defaultEnable;
             Switch();
-            EndInit?.Invoke(this, new EventArgs());
+            hasInitialized = true;
+            TKLog.Log("InventoryBase Init Success!", this, enableLog);
         }
 
         private void DspUpdate(object sender, Watch e) {
@@ -54,6 +60,7 @@ namespace ToolKid.InventorySystem {
                 transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(hidePosition.x, hidePosition.y);
             }
             enable = !enable;
+            TKLog.Log("InventoryBase 'enable' is " + enable, this, enableLog);
         }
 
         public void Enable() {
@@ -61,6 +68,7 @@ namespace ToolKid.InventorySystem {
                 transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(lastPosition.x, lastPosition.y);
                 enable = !enable;
             }
+            TKLog.Log("InventoryBase 'enable' is " + enable, this, enableLog);
         }
 
         public void Disable() {
@@ -69,6 +77,7 @@ namespace ToolKid.InventorySystem {
                 transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(hidePosition.x, hidePosition.y);
                 enable = !enable;
             }
+            TKLog.Log("InventoryBase 'enable' is " + enable, this, enableLog);
         }
     }
 }

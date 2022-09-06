@@ -71,10 +71,15 @@ namespace ToolKid.InventorySystem {
 
         [SerializeField] private int stackCount;
         public int StackCount {
-            get => stackCount;
+            get {
+               return stackCount;
+            }
             set {
                 stackCount = value;
                 SlotUpdate?.Invoke(this, new EventArgs());
+                if (stackCount < 1) {
+                    Clear();
+                }
             }
         }
 

@@ -135,6 +135,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4716917016045143649}
     - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
+      propertyPath: enableLog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
       propertyPath: props.item.name
       value: "\u91D1\u6212\u6307"
       objectReference: {fileID: 0}
@@ -449,6 +453,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4716917016045143649}
     - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
+      propertyPath: enableLog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
       propertyPath: props.item.name
       value: "\u6BD2\u860B\u679C"
       objectReference: {fileID: 0}
@@ -609,6 +617,10 @@ PrefabInstance:
       propertyPath: display
       value: 
       objectReference: {fileID: 4716917016045143649}
+    - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
+      propertyPath: enableLog
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
       propertyPath: props.item.name
       value: "\u6B78\u9014\u5377\u8EF8"
@@ -868,6 +880,10 @@ PrefabInstance:
       propertyPath: display
       value: 
       objectReference: {fileID: 4716917016045143649}
+    - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
+      propertyPath: enableLog
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
       propertyPath: props.item.name
       value: "\u65B7\u6389\u7684\u528D"
@@ -1330,6 +1346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f31565145ac98b24f8fc9ec24857ca41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableLog: 0
   props:
     name: "\u6280\u80FD\u6B04"
     index: 0
@@ -1551,6 +1568,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f31565145ac98b24f8fc9ec24857ca41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableLog: 0
   props:
     name: "\u7269\u54C1\u6B04"
     index: 0
@@ -1620,6 +1638,10 @@ PrefabInstance:
       propertyPath: display
       value: 
       objectReference: {fileID: 4716917016045143649}
+    - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
+      propertyPath: enableLog
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
       propertyPath: props.item.name
       value: "\u6B78\u9014\u5377\u8EF8"
@@ -1780,6 +1802,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f31565145ac98b24f8fc9ec24857ca41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableLog: 0
   props:
     name: "\u88DD\u5099\u6B04"
     index: 0
@@ -2299,6 +2322,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4716917016045143649}
     - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
+      propertyPath: enableLog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
       propertyPath: props.item.name
       value: "\u79D8\u9280"
       objectReference: {fileID: 0}
@@ -2798,6 +2825,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4716917016045143649}
     - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
+      propertyPath: enableLog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
       propertyPath: props.item.name
       value: "\u6B78\u9014\u5377\u8EF8"
       objectReference: {fileID: 0}
@@ -3262,6 +3293,10 @@ PrefabInstance:
       propertyPath: display
       value: 
       objectReference: {fileID: 4716917016045143649}
+    - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
+      propertyPath: enableLog
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5147025316244387487, guid: 76dc1bbf8fa86fb4cbf4da64b6649173, type: 3}
       propertyPath: props.item.name
       value: "\u795E\u79D8\u9B54\u6CD5\u66F8"

@@ -29,14 +29,22 @@ namespace ToolKid.InventorySystem {
         [HideInInspector]
         public UnityEvent onUndescribe;
 
-
         void Awake() {
-            Timer.CentiSecond += Counterdown;
             Base = GetComponent<InventoryBase>();
-            Base.EndInit += Init;            
+            StartCoroutine(Init());
         }
 
-        private void Init(object sender, EventArgs e) {
+        public IEnumerator Init() {
+            while (!Base.HasInitialized) {
+                yield return Init();
+            }
+            AddListener();
+            TKLog.Log("Describer Init Success!", this, enableLog);
+            yield return null;
+        }
+
+        public void AddListener() {
+            Timer.CentiSecond += Counterdown;            
             for (int i = 0; i < Base.SlotBases.Length; i++) {
                 Base.SlotBases[i].Describe += OnDescribe;
                 Base.SlotBases[i].Undescribe += OnUndescribe;
