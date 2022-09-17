@@ -57,6 +57,9 @@ namespace ToolKid.InventorySystem {
 
 
     }
+
+    public delegate void SlotAction(object sender, Slot e);
+
     [System.Serializable]
     public class Slot {
 

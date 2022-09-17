@@ -9,71 +9,73 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 
 namespace ToolKid.InventorySystem {
+
     public class Describer : MonoBehaviour {
 
         public bool enableLog = false;
 
         private InventoryBase Base;
-
         private bool isDescribing = false;        
 
         public RectTransform informationPanel;
-        //public GameObject InformationPanel;
-
         public Text description;
         public Text count;
         public Text price;
 
-        [HideInInspector]
         public UnityEvent onDescribe;
-        [HideInInspector]
         public UnityEvent onUndescribe;
+
 
         void Awake() {
             Base = GetComponent<InventoryBase>();
-            StartCoroutine(Init());
+
+            Base.DescribeAction.ActionTrigger += OnDescribe;
+            Base.UndescribeAction.ActionTrigger += OnUndescribe;
         }
 
-        public IEnumerator Init() {
-            while (!Base.HasInitialized) {
-                yield return Init();
-            }
-            AddListener();
-            TKLog.Log("Describer Init Success!", this, enableLog);
-            yield return null;
+        void OnDestroy() {
+            Base.DescribeAction.ActionTrigger -= OnDescribe;
+            Base.UndescribeAction.ActionTrigger -= OnUndescribe;
         }
 
-        public void AddListener() {
-            Timer.CentiSecond += Counterdown;            
-            for (int i = 0; i < Base.SlotBases.Length; i++) {
-                Base.SlotBases[i].Describe += OnDescribe;
-                Base.SlotBases[i].Undescribe += OnUndescribe;
-            }
+        public void OnDescribe(object sender, Slot e) {            
+            isDescribing = true;           
+            StartCoroutine(DescribeAction(e));            
         }
 
-        private void Counterdown(object sender, Watch e) {            
-            if (isDescribing) {
+        public void OnUndescribe(object sender, Slot e) {            
+            isDescribing = false;                    
+        }
+
+        /// <summary>
+        /// If the time lap which pointer move from old to new less than a frame, keep describer showing.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns>WaitForEndOfFrame()</returns>
+        private IEnumerator DescribeAction(Slot e) {
+            OnDescribe(e);
+            while (isDescribing) {
                 informationPanel.position = Input.mousePosition;
+                yield return new WaitForEndOfFrame();
             }
+            OnUndescribe(e);
         }
 
-        private void OnDescribe(object sender, Slot e) {            
-            onDescribe.Invoke();
-            isDescribing = true;
+        private void OnDescribe(Slot e) {            
             informationPanel.position = Input.mousePosition;
             description.text = e.Item.Description;
             count.text = e.StackCount.ToString("000");
             price.text = e.Item.Price.ToString("000");
             informationPanel.gameObject.SetActive(isDescribing);
-            TKLog.Log("Describe " + e.Item.Index, this, enableLog);
+            onDescribe.Invoke();
+            TKLog.Log("Describe " + e.Item.Index, this, enableLog);            
         }
 
-        private void OnUndescribe(object sender, Slot e) {            
-            onUndescribe.Invoke();
-            isDescribing = false;
+        private void OnUndescribe(Slot e) {            
             informationPanel.position = Input.mousePosition;
-            description.text = "It is expect on undescribe";            
+            description.text = "It is expect on undescribe";
             informationPanel.gameObject.SetActive(isDescribing);
+            onUndescribe.Invoke();
             TKLog.Log("Undescribe " + e.Item.Index, this, enableLog);
         }
     }

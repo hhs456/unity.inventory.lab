@@ -11,6 +11,8 @@ using UnityEngine.UI;
 namespace ToolKid.InventorySystem {
     public class SlotBase : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDragHandler, IBeginDragHandler, IEndDragHandler, IDropHandler {
 
+        private InventoryBase inventoryBase;
+
         public bool enableLog = false;
         [SerializeField]
         private Slot props;
@@ -29,7 +31,7 @@ namespace ToolKid.InventorySystem {
         private int index;
         public int Index { get => index;}
 
-        private bool isDescribing = false;
+        private bool isAfterHoverTrigger = false;
         private bool isHovering = false;
         //private bool isDragging = false;
         private bool isValidDrop = false;        
@@ -38,12 +40,12 @@ namespace ToolKid.InventorySystem {
         
 
         [SerializeField]
-        private float describeHoverTime = 0.5f;
+        private float HoverEventTriggerTime = 0.02f;
 
         private Image dragging;
 
-        public event EventHandler<Slot> Describe;
-        public event EventHandler<Slot> Undescribe;
+        public event EventHandler<Slot> HoverEventTriggerEnter;
+        public event EventHandler<Slot> HoverEventTriggerExit;
 
         public event EventHandler<Slot> Abandon;
 
@@ -54,7 +56,15 @@ namespace ToolKid.InventorySystem {
         void Awake() {
             ModifyTo(props);
             props.SlotUpdate += SlotUpdate;
-            Timer.CentiSecond += Counterdown;            
+            TimerSystem.GameWatch.Main.WatchUpdate += Counterdown;
+            inventoryBase = GetComponentInParent<InventoryBase>();
+            inventoryBase.AddDescribeAction(this);
+            inventoryBase.AddAbandonAction(this);
+        }
+
+        void OnDestroy() {
+            inventoryBase.RemoveDescribeAction(this);
+            inventoryBase.RemoveAbandonAction(this);
         }
 
         private void SlotUpdate(object sender, EventArgs e) {
@@ -93,13 +103,13 @@ namespace ToolKid.InventorySystem {
             isHovering = true;
         }
 
-        private void Counterdown(object sender, Watch e) {
+        private void Counterdown(object sender, TimerSystem.WatchArgs e) {
             if (isHovering) {
                 // if pointer hovers on slot ...                
                 stopWatch += 0.01f;
-                if (stopWatch >= describeHoverTime && !isDescribing && !dragging && props.Item.Name != "") {
-                    isDescribing = true;
-                    Describe?.Invoke(this, props);
+                if (stopWatch >= HoverEventTriggerTime && !isAfterHoverTrigger && !dragging && props.Item.Name != "") {
+                    isAfterHoverTrigger = true;                    
+                    HoverEventTriggerEnter?.Invoke(this, props);
                 }
             }
 
@@ -108,9 +118,9 @@ namespace ToolKid.InventorySystem {
         public void OnPointerExit(PointerEventData eventData) {
             isHovering = false;
             stopWatch = 0;
-            if (isDescribing) {
-                isDescribing = false;
-                Undescribe?.Invoke(this, props);                
+            if (isAfterHoverTrigger) {
+                isAfterHoverTrigger = false;
+                HoverEventTriggerExit?.Invoke(this, props);                
             }
         }
 
@@ -130,6 +140,7 @@ namespace ToolKid.InventorySystem {
             if (!dragSlot.dragging) {
                 return;
             }
+
             TKLog.Log("Drop To " + this, this, enableLog);
             SlotBase dropSlot = this;
 
@@ -175,13 +186,11 @@ namespace ToolKid.InventorySystem {
 
         public void OnBeginDrag(PointerEventData eventData) {            
             isValidDrop = false;
-            if (isDescribing) {
-                isDescribing = false;
-                Undescribe?.Invoke(this, props);
-                //OnUndescribe();
+            if (isAfterHoverTrigger) {
+                isAfterHoverTrigger = false;
+                HoverEventTriggerExit?.Invoke(this, props);                
             }
-            if (props.Item.Name != "") {
-                //isDragging = true;
+            if (props.Item.Name != "") {                
                 dragging = Instantiate(itemImage, transform.parent);
                 dragging.raycastTarget = false;                
                 TKLog.Log("Valid Drag From " + props.Item.Index, this, enableLog);

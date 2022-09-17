@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 namespace ToolKid.InventorySystem {
     public class InventoryBase : MonoBehaviour {
 
@@ -36,8 +37,13 @@ namespace ToolKid.InventorySystem {
 
         public event EventHandler EndInit;
 
+        public EventAction DescribeAction = new EventAction();
+        public EventAction UndescribeAction = new EventAction();
+        public EventAction AbandonAction = new EventAction();
+
+
         void Awake() {
-            Timer.CentiSecond += DspUpdate;
+            TimerSystem.GameWatch.Main.WatchUpdate += DspUpdate;
             slotBases = transform.GetComponentsInChildren<SlotBase>();
             enable = !defaultEnable;
             Switch();
@@ -45,7 +51,7 @@ namespace ToolKid.InventorySystem {
             TKLog.Log("InventoryBase Init Success!", this, enableLog);
         }
 
-        private void DspUpdate(object sender, Watch e) {
+        private void DspUpdate(object sender, TimerSystem.WatchArgs e) {
             if (Input.GetKeyDown(KeyCode)) {
                 Switch();
             }
@@ -79,5 +85,24 @@ namespace ToolKid.InventorySystem {
             }
             TKLog.Log("InventoryBase 'enable' is " + enable, this, enableLog);
         }
+
+        #region # Describer Callback
+        public void AddDescribeAction(SlotBase slot) {            
+            slot.HoverEventTriggerEnter += DescribeAction.OnActionTrigger;
+            slot.HoverEventTriggerExit += UndescribeAction.OnActionTrigger;
+        }
+        public void RemoveDescribeAction(SlotBase slot) {
+            slot.HoverEventTriggerEnter -= DescribeAction.OnActionTrigger;
+            slot.HoverEventTriggerExit -= UndescribeAction.OnActionTrigger;
+        }        
+        #endregion
+        #region # Describer Callback
+        public void AddAbandonAction(SlotBase slot) {
+            slot.Abandon += AbandonAction.OnActionTrigger;            
+        }
+        public void RemoveAbandonAction(SlotBase slot) {
+            slot.Abandon -= AbandonAction.OnActionTrigger;
+        }
+        #endregion
     }
 }

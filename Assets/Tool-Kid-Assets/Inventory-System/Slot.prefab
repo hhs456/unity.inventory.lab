@@ -245,12 +245,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59090940f9b8e974ea4dcb68ef5d075d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableLog: 0
   props:
     item:
       name: 
       description: 
       index: 0
       price: 0
+      tag: []
       spriteAddress: 
     stackLimit: 0
     stackCount: 0
@@ -263,7 +265,7 @@ MonoBehaviour:
   stackCount: {fileID: 6579021822828510353}
   emptyIconAddress: Assets/RPG_inventory_icons/f.PNG
   stopWatch: 0
-  describeHoverTime: 0.01
+  HoverTriggerTime: 0.02
 --- !u!1 &5882042921720346890
 GameObject:
   m_ObjectHideFlags: 0
