@@ -1,79 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace ToolKid.InventorySystem {
-    /// <summary>
-    /// Define the entire data of Item.
-    /// </summary>
-    [System.Serializable]
-    public class ItemProps {
+    public class Item : MonoBehaviour {
+
+        public bool enableLog = false;
+        public InventoryBase InventoryBase;
 
         [SerializeField]
-        private string name;
-        public string Name { get => name; }
-
-        [SerializeField]
-        private string description;
-        public string Description { get => description; }
-
-        [SerializeField]
-        private string index;
-        public string Index { get => index; }
-
-        [SerializeField]
-        private int price;
-        public int Price { get => price; }
-
-        [SerializeField]
-        private string[] tag;
-        public string[] Tag { get => tag; }
-
-        [SerializeField]
-        private string spriteAddress;
-
-        public string SpriteAddress { get => spriteAddress; }
-
-        public void Clear() {
-            name = "";
-            description = "";
-            index = "";
-            price = 0;
-            spriteAddress = "Assets/RPG_inventory_icons/f.PNG";
+        private ItemProps props;
+        public ItemProps Props {
+            get {
+                return props;
+            }
+            set {
+                props = value;
+            }
         }
 
-        public void LoadDataFromAddress(ItemArgs itemArgs) {
-            Addressables.LoadAssetAsync<TextAsset>(itemArgs.Address).Completed += OnItemDataLoaded;
+        [SerializeField] private int stackCount;
+        public int StackCount {
+            get {
+                return stackCount;
+            }
+            set {
+                stackCount = value;
+            }
         }
-        public void OnItemDataLoaded(AsyncOperationHandle<TextAsset> asyncOperationHandle) {
-            ItemProps itemProps = JsonUtility.FromJson<ItemProps>(asyncOperationHandle.Result.text);
-            name = itemProps.name;
-            description = itemProps.description;
-            index = itemProps.index;
-            price = itemProps.price;
-            spriteAddress = itemProps.spriteAddress;
-        }
-    }
 
-    /// <summary>
-    /// Define the save data of Item.
-    /// </summary>
-    [System.Serializable]
-    public struct ItemArgs {
-        /// <summary>
-        /// The identity number of Item.
-        /// </summary>
-        [SerializeField]
-        private string index;
-        public string Index { get => index; }
-        /// <summary>
-        /// The save path of Item data.
-        /// </summary>
-        [SerializeField]
-        private string address;
-        public string Address { get => address; }
+        public void Collect() {
+            InventoryBase.Add(props, stackCount);
+        }
     }
 }

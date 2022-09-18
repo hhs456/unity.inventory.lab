@@ -51,6 +51,7 @@ namespace ToolKid.InventorySystem {
 
         void OnValidate() {
             index = transform.GetSiblingIndex();
+            props.SlotIndex = index;
         }
 
         void Awake() {
@@ -58,13 +59,13 @@ namespace ToolKid.InventorySystem {
             props.SlotUpdate += SlotUpdate;
             TimerSystem.GameWatch.Main.WatchUpdate += Counterdown;
             inventoryBase = GetComponentInParent<InventoryBase>();
-            inventoryBase.AddDescribeAction(this);
-            inventoryBase.AddAbandonAction(this);
+            inventoryBase.AddDescribeTrigger(this);
+            inventoryBase.AddAbandonTrigger(this);
         }
 
         void OnDestroy() {
-            inventoryBase.RemoveDescribeAction(this);
-            inventoryBase.RemoveAbandonAction(this);
+            inventoryBase.RemoveDescribeTrigger(this);
+            inventoryBase.RemoveAbandonTrigger(this);
         }
 
         private void SlotUpdate(object sender, EventArgs e) {
@@ -80,7 +81,7 @@ namespace ToolKid.InventorySystem {
                 props.RelocateItemFrom(target);
                 LoadDataFrom(props.Item.SpriteAddress);
                 nameText.text = props.Item.Name;
-                if (props.StackLimit > 1) {
+                if (props.Item.StackLimit > 1) {
                     // is stackable item
                     stackCount.text = props.StackCount.ToString();
                 }
@@ -172,10 +173,8 @@ namespace ToolKid.InventorySystem {
                 }
             }
         }
-        public void InvalidDrop() {
-            TKLog.Log("Abandon " + props.Item.Index + " From " + this, this, enableLog);
-            Abandon?.Invoke(this, props);
-            props.Clear();
+        public void InvalidDrop() {            
+            Abandon?.Invoke(this, props);            
         }
 
         public void OnDrag(PointerEventData eventData) {
@@ -208,6 +207,10 @@ namespace ToolKid.InventorySystem {
         }
 
         public void LoadDataFrom(string address) {
+            if (address == "") {
+                props.Clear();
+                address = emptyIconAddress;
+            }
             address = address ?? emptyIconAddress;
             Addressables.LoadAssetAsync<Sprite>(address).Completed += OnAssetObjLoaded;
         }

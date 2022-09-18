@@ -2,9 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace ToolKid.InventorySystem {
     [System.Serializable]
@@ -28,37 +25,55 @@ namespace ToolKid.InventorySystem {
         private int max;
         public int Max { get => max; }
 
-        private Dictionary<string, LinkedList<Slot>> Slots { get; set; }
+        private Dictionary<string, LinkedList<Slot>> slots = new Dictionary<string, LinkedList<Slot>>();
+        public Dictionary<string, LinkedList<Slot>> Slots {
+            get {
+                return slots;
+            }
+            set {
+                slots = value;
+            }
+        }
 
-        public void AddNewItem(ItemProps item) {
-            LinkedList<Slot> slots = new LinkedList<Slot>();            
-            LinkedListNode<Slot> slot = new LinkedListNode<Slot>(new Slot(item));
+        public void BuildTableWith(Slot slot) {
+            if (Slots.TryGetValue(slot.Item.Index, out LinkedList<Slot> slots)) {                
+                slots.AddLast(slot);                
+            }
+            else {
+                AddNewItem(slot);
+            }
+        }
+
+        public int TryAdd(ItemProps item, int count, out LinkedList<Slot> slots) {
+            if(Slots.TryGetValue(item.Index, out slots)) {
+                LinkedListNode<Slot> slotNode = slots.First;
+                return TryStack(slotNode, count);               
+            }
+            return count;
+        }
+
+        public void AddNewItem(Slot slot) {
+            LinkedList<Slot> slots = new LinkedList<Slot>();
             slots.AddLast(slot);
-            Slots.Add(item.Index, slots);
+            Slots.Add(slot.Item.Index, slots);
         }
 
-        public void AddSlotStack(ItemProps item, int count) {
-            Slots.TryGetValue(item.Index, out LinkedList<Slot> slots);
-            LinkedListNode<Slot> slotNode = slots.First;           
-            AddSlotStack(slotNode, count);
-        }
-
-        public void AddSlotStack(LinkedListNode<Slot> node, int count) {
+        public int TryStack(LinkedListNode<Slot> node, int count) {
             Slot slot = node.Value;
             int overload = slot.Add(count);
             if(overload > 0) {
-                AddSlotStack(node.Next, count);
+                if (node.Next != null) {                    
+                    return TryStack(node.Next, count);
+                }
             }
+            return overload;
         }
 
         public void Remove(string itemIndex) {
             Slots.Remove(itemIndex);
         }
 
-
-    }
-
-    public delegate void SlotAction(object sender, Slot e);
+    }    
 
     [System.Serializable]
     public class Slot {
@@ -68,9 +83,7 @@ namespace ToolKid.InventorySystem {
         [SerializeField]
         private ItemProps item;
         public ItemProps Item { get => item; }
-
-        [SerializeField] private int stackLimit;
-        public int StackLimit { get => stackLimit; }
+                
 
         [SerializeField] private int stackCount;
         public int StackCount {
@@ -95,7 +108,7 @@ namespace ToolKid.InventorySystem {
 
         [SerializeField]
         private int slotIndex;
-        public int SlotIndex { get => slotIndex; }
+        public int SlotIndex { get => slotIndex; set => slotIndex = value; }
 
         [SerializeField]
         private int addedIndex;
@@ -108,27 +121,39 @@ namespace ToolKid.InventorySystem {
             SlotUpdate?.Invoke(this, new EventArgs());
         }
 
-        public Slot (ItemProps item) {
+        public Slot(ItemProps item) {
             this.item = item;
             SlotUpdate?.Invoke(this, new EventArgs());
         }
         public Slot(Slot slot, int index) {
-            item = slot.item;
-            stackLimit = slot.stackLimit;
+            item = slot.item;            
+            stackCount = slot.stackCount;
+            slotIndex = index;
+            addedIndex = slot.addedIndex;
+            SlotUpdate?.Invoke(this, new EventArgs());
+        }
+        public Slot(Slot slot, ItemProps item, int index) {
+            this.item = item;            
             stackCount = slot.stackCount;
             slotIndex = index;
             addedIndex = slot.addedIndex;
             SlotUpdate?.Invoke(this, new EventArgs());
         }
 
+        public void Set(ItemProps item, int count) {
+            this.item = item;
+            stackCount = count;
+            SlotUpdate?.Invoke(this, new EventArgs());
+        }
+
         public int Add(int count) {
-            if(stackCount == stackLimit) {
+            if(stackCount == item.StackLimit) {
                 return count;
             }
             stackCount += count;
-            int overload = stackCount - stackLimit;
+            int overload = stackCount - item.StackLimit;
             if (overload > 0) {
-                stackCount = stackLimit;
+                stackCount = item.StackLimit;
             }
             SlotUpdate?.Invoke(this, new EventArgs());
             return overload;
@@ -144,16 +169,14 @@ namespace ToolKid.InventorySystem {
         }
         
         public void RelocateItemFrom(Slot slot) {
-            item = slot.item;
-            stackLimit = slot.stackLimit;
+            item = slot.item;            
             stackCount = slot.stackCount;            
             addedIndex = slot.addedIndex;
             //SlotUpdate?.Invoke(this, new EventArgs());
         }
 
         public void Clear() {
-            item.Clear();
-            stackLimit = 0;
+            item.Clear();            
             stackCount = 0;
             addedIndex = 0;
             SlotUpdate?.Invoke(this, new EventArgs());

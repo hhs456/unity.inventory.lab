@@ -41,7 +41,5 @@ namespace ToolKid.InventorySystem {
         public void OpenInventory(string name) {
             InventoryTable[name].Disable();
         }
-
-
     }
 }

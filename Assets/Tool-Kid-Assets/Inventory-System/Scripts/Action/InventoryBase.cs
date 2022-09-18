@@ -8,7 +8,7 @@ namespace ToolKid.InventorySystem {
 
         public bool enableLog = false;
         [SerializeField]
-        private Inventory props;
+        private Inventory props = new Inventory();
         public Inventory Props {
             get {
                 return props;
@@ -34,12 +34,10 @@ namespace ToolKid.InventorySystem {
 
         private bool hasInitialized = false;
         public bool HasInitialized { get => hasInitialized; }
-
-        public event EventHandler EndInit;
-
-        public EventAction DescribeAction = new EventAction();
-        public EventAction UndescribeAction = new EventAction();
-        public EventAction AbandonAction = new EventAction();
+        
+        public SlotEvent DescribeAction = new SlotEvent();
+        public SlotEvent UndescribeAction = new SlotEvent();
+        public SlotEvent AbandonAction = new SlotEvent();
 
 
         void Awake() {
@@ -49,6 +47,11 @@ namespace ToolKid.InventorySystem {
             Switch();
             hasInitialized = true;
             TKLog.Log("InventoryBase Init Success!", this, enableLog);
+
+            for (int i = 0; i < slotBases.Length; i++) {
+                TKLog.Log("Build " + slotBases[i].Props.StackCount + " " + slotBases[i].Props.Item.Index + " into " + slotBases[i].name, this, enableLog);
+                props.BuildTableWith(slotBases[i].Props);
+            }
         }
 
         private void DspUpdate(object sender, TimerSystem.WatchArgs e) {
@@ -85,23 +88,51 @@ namespace ToolKid.InventorySystem {
             }
             TKLog.Log("InventoryBase 'enable' is " + enable, this, enableLog);
         }
+        /// <summary>
+        /// Add a item with given item and count arguments into this inventory.
+        /// </summary>
+        /// <param name="item">Item properties of target</param>
+        /// <param name="count">Item count of target</param>
+        public void Add(ItemProps item, int count) {
+            if (props.TryAdd(item, count, out LinkedList<Slot> slots) > 0) {
+                int i = FirstEmptySlotIndex();
+                if (i != -1) {
+                    SlotBases[i].Props.Set(item, count);
+                    slots.AddLast(SlotBases[i].Props);
+                    TKLog.Log("Build " + SlotBases[i].Props.StackCount + " " + SlotBases[i].Props.Item.Index + " into " + SlotBases[i].name, this, enableLog);
+                }
+                else {
+                    TKLog.Log("Inventory is full!", this, enableLog);
+                }
+            }
+        }
 
-        #region # Describer Callback
-        public void AddDescribeAction(SlotBase slot) {            
-            slot.HoverEventTriggerEnter += DescribeAction.OnActionTrigger;
-            slot.HoverEventTriggerExit += UndescribeAction.OnActionTrigger;
+        public int FirstEmptySlotIndex() {
+            for (int i = 0; i < SlotBases.Length; i++) {
+                if (SlotBases[i].Props.Item.Index == "") {                    
+                    return i;
+                }
+            }
+            return -1;
         }
-        public void RemoveDescribeAction(SlotBase slot) {
-            slot.HoverEventTriggerEnter -= DescribeAction.OnActionTrigger;
-            slot.HoverEventTriggerExit -= UndescribeAction.OnActionTrigger;
-        }        
+
+        #region # Describe Action Callback
+        public void AddDescribeTrigger(SlotBase slot) {            
+            slot.HoverEventTriggerEnter += DescribeAction.OnTrigger;
+            slot.HoverEventTriggerExit += UndescribeAction.OnTrigger;
+        }
+        public void RemoveDescribeTrigger(SlotBase slot) {
+            slot.HoverEventTriggerEnter -= DescribeAction.OnTrigger;
+            slot.HoverEventTriggerExit -= UndescribeAction.OnTrigger;
+        }
         #endregion
-        #region # Describer Callback
-        public void AddAbandonAction(SlotBase slot) {
-            slot.Abandon += AbandonAction.OnActionTrigger;            
+
+        #region # Abandon Action Callback
+        public void AddAbandonTrigger(SlotBase slot) {
+            slot.Abandon += AbandonAction.OnTrigger;            
         }
-        public void RemoveAbandonAction(SlotBase slot) {
-            slot.Abandon -= AbandonAction.OnActionTrigger;
+        public void RemoveAbandonTrigger(SlotBase slot) {
+            slot.Abandon -= AbandonAction.OnTrigger;
         }
         #endregion
     }

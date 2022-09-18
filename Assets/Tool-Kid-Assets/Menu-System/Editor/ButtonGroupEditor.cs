@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -16,9 +14,7 @@ public class ButtonGroupEditor : Editor {
 
     ReorderableList[] list = new ReorderableList[3];
     SerializedProperty[] prop = new SerializedProperty[3];
-
-    bool isDebugging = false;
-
+    
     static Rect[] drapArea = new Rect[3];
 
     float w = 275;

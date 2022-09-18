@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ToolKid.TimerSystem {
 
-    public class GameWatch : MonoBehaviour {
+    public class GameWatch : TKBehaviour {
         private bool isStart;
         private bool isPause;
         public Text display;
@@ -24,12 +24,11 @@ namespace ToolKid.TimerSystem {
 
         public List<Timer> eventWatches;
 
-
-        void Awake() {
-            Begin();
+        protected void Awake() {
+            Begin();            
         }
 
-        private void Begin() {
+        protected void Begin() {
             isStart = true;
             isPause = false;
             main.Reset(this);
