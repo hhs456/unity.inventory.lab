@@ -125,24 +125,16 @@ namespace ToolKid.InventorySystem {
             }
         }
 
-        private void Clear() {
-            TKLog.Log("Clear " + this, this, enableLog);            
-            if (props.Item != null) {
-                Addressables.LoadAssetAsync<Sprite>(props.Item.SpriteAddress).Completed -= OnAssetObjLoaded;
-            }
-            props.Clear();                       
-        }
-
         public void OnDrop(PointerEventData eventData) {
-
-            InventoryBase dragFrom = eventData.pointerDrag.GetComponentInParent<InventoryBase>();
             SlotBase dragSlot = eventData.pointerDrag.GetComponent<SlotBase>();
 
             if (!dragSlot.dragging) {
                 return;
             }
-
+            
             TKLog.Log("Drop To " + this, this, enableLog);
+
+            isHovering = true;
             SlotBase dropSlot = this;
 
             dragSlot.isValidDrop = true;
@@ -151,31 +143,8 @@ namespace ToolKid.InventorySystem {
             if (dropSlot == dragSlot) {
                 return;
             }
-
-            if (dropSlot.props.Item.Index != dragSlot.props.Item.Index) {
-                Slot temp = new Slot(dragSlot.props, dragSlot.index);
-                dragSlot.ModifyTo(dropSlot.props);
-                dropSlot.ModifyTo(temp);
-                TKLog.Log("Finish Exchanging", this, enableLog);
-            }
-            else {
-                TKLog.Log("Stack To " + this, this, enableLog);
-                int overStack = dropSlot.props.Add(dragSlot.props.StackCount);
-                
-                if (overStack == dragSlot.props.StackCount) {
-                    // exchange slot stack count
-                    dragSlot.props.StackCount = dropSlot.props.StackCount;
-                    dropSlot.props.StackCount = overStack;
-                }                
-                else {
-                    // calculate drag slot count
-                    dragSlot.props.StackCount = overStack;                    
-                }
-            }
-        }
-        public void InvalidDrop() {            
-            Abandon?.Invoke(this, props);            
-        }
+            inventoryBase.ChangeSlot(dropSlot, dragSlot);
+        }        
 
         public void OnDrag(PointerEventData eventData) {
             if (dragging) {
@@ -199,7 +168,7 @@ namespace ToolKid.InventorySystem {
         public void OnEndDrag(PointerEventData eventData) {
             //isDragging = false;
             if (!isValidDrop) {
-                InvalidDrop();
+                Abandon?.Invoke(this, props);
             }
             if (dragging) {
                 Destroy(dragging.gameObject);
@@ -207,11 +176,11 @@ namespace ToolKid.InventorySystem {
         }
 
         public void LoadDataFrom(string address) {
+            address = address ?? emptyIconAddress;
             if (address == "") {
                 props.Clear();
                 address = emptyIconAddress;
-            }
-            address = address ?? emptyIconAddress;
+            }            
             Addressables.LoadAssetAsync<Sprite>(address).Completed += OnAssetObjLoaded;
         }
         public void OnAssetObjLoaded(AsyncOperationHandle<Sprite> asyncOperationHandle) {

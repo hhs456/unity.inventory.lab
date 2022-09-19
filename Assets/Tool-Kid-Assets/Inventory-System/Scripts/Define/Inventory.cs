@@ -25,8 +25,8 @@ namespace ToolKid.InventorySystem {
         private int max;
         public int Max { get => max; }
 
-        private Dictionary<string, LinkedList<Slot>> slots = new Dictionary<string, LinkedList<Slot>>();
-        public Dictionary<string, LinkedList<Slot>> Slots {
+        private Dictionary<string, LinkedList<SlotBase>> slots = new Dictionary<string, LinkedList<SlotBase>>();
+        public Dictionary<string, LinkedList<SlotBase>> Slots {
             get {
                 return slots;
             }
@@ -35,8 +35,13 @@ namespace ToolKid.InventorySystem {
             }
         }
 
-        public void BuildTableWith(Slot slot) {
-            if (Slots.TryGetValue(slot.Item.Index, out LinkedList<Slot> slots)) {                
+        public LinkedListNode<SlotBase> FindNode(SlotBase slot) {
+            Slots.TryGetValue(slot.Props.Item.Index, out LinkedList<SlotBase> slots);
+            return slots.Find(slot);
+        }
+
+        public void BuildTableWith(SlotBase slot) {
+            if (Slots.TryGetValue(slot.Props.Item.Index, out LinkedList<SlotBase> slots)) {                
                 slots.AddLast(slot);                
             }
             else {
@@ -44,23 +49,23 @@ namespace ToolKid.InventorySystem {
             }
         }
 
-        public int TryAdd(ItemProps item, int count, out LinkedList<Slot> slots) {
+        public int TryAdd(ItemProps item, int count, out LinkedList<SlotBase> slots) {
             if(Slots.TryGetValue(item.Index, out slots)) {
-                LinkedListNode<Slot> slotNode = slots.First;
+                LinkedListNode<SlotBase> slotNode = slots.First;
                 return TryStack(slotNode, count);               
             }
             return count;
         }
 
-        public void AddNewItem(Slot slot) {
-            LinkedList<Slot> slots = new LinkedList<Slot>();
+        public void AddNewItem(SlotBase slot) {
+            LinkedList<SlotBase> slots = new LinkedList<SlotBase>();
             slots.AddLast(slot);
-            Slots.Add(slot.Item.Index, slots);
+            Slots.Add(slot.Props.Item.Index, slots);
         }
 
-        public int TryStack(LinkedListNode<Slot> node, int count) {
-            Slot slot = node.Value;
-            int overload = slot.Add(count);
+        public int TryStack(LinkedListNode<SlotBase> node, int count) {
+            SlotBase slot = node.Value;
+            int overload = slot.Props.Add(count);
             if(overload > 0) {
                 if (node.Next != null) {                    
                     return TryStack(node.Next, count);

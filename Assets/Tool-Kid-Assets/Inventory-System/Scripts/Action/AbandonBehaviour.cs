@@ -31,7 +31,12 @@ namespace ToolKid.InventorySystem {
         public void Action(Slot e) {
             lastRelatedSlot = Base.transform.GetChild(e.SlotIndex).GetComponent<SlotBase>();
             lastAbandonedTarget = new Slot(e, new ItemProps(e), e.SlotIndex);
-            e.Clear();
+            Base.Props.Slots[e.Item.Index].Remove(lastRelatedSlot);
+            if (Base.Props.Slots[e.Item.Index].Count == 0) {
+                Base.Props.Slots.Remove(e.Item.Index);
+            }
+            lastRelatedSlot.Props.Clear();
+            
             TKLog.Log("Abandon " + e.Item.Index + " From " + this, this, enableLog);                     
         }
     }

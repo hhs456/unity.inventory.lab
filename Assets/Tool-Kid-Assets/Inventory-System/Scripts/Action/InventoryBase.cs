@@ -50,7 +50,7 @@ namespace ToolKid.InventorySystem {
 
             for (int i = 0; i < slotBases.Length; i++) {
                 TKLog.Log("Build " + slotBases[i].Props.StackCount + " " + slotBases[i].Props.Item.Index + " into " + slotBases[i].name, this, enableLog);
-                props.BuildTableWith(slotBases[i].Props);
+                props.BuildTableWith(slotBases[i]);
             }
         }
 
@@ -94,15 +94,40 @@ namespace ToolKid.InventorySystem {
         /// <param name="item">Item properties of target</param>
         /// <param name="count">Item count of target</param>
         public void Add(ItemProps item, int count) {
-            if (props.TryAdd(item, count, out LinkedList<Slot> slots) > 0) {
+            if (props.TryAdd(item, count, out LinkedList<SlotBase> slots) > 0) {
                 int i = FirstEmptySlotIndex();
                 if (i != -1) {
                     SlotBases[i].Props.Set(item, count);
-                    slots.AddLast(SlotBases[i].Props);
+                    props.BuildTableWith(SlotBases[i]);
                     TKLog.Log("Build " + SlotBases[i].Props.StackCount + " " + SlotBases[i].Props.Item.Index + " into " + SlotBases[i].name, this, enableLog);
                 }
                 else {
                     TKLog.Log("Inventory is full!", this, enableLog);
+                }
+            }
+        }
+
+        public void ChangeSlot(SlotBase S1, SlotBase S2) {
+            if (S1.Props.Item.Index != S2.Props.Item.Index) {
+                Slot temp = new Slot(S2.Props, S2.Index);
+                Props.FindNode(S1).Value = S2;
+                Props.FindNode(S2).Value = S1;                
+                S2.ModifyTo(S1.Props);
+                S1.ModifyTo(temp);
+                TKLog.Log("Finish Exchanging", this, enableLog);
+            }
+            else {
+                TKLog.Log("Stack To " + this, this, enableLog);
+                int overStack = S1.Props.Add(S2.Props.StackCount);
+
+                if (overStack == S2.Props.StackCount) {
+                    // exchange slot stack count
+                    S2.Props.StackCount = S1.Props.StackCount;
+                    S1.Props.StackCount = overStack;
+                }
+                else {
+                    // calculate drag slot count
+                    S2.Props.StackCount = overStack;
                 }
             }
         }

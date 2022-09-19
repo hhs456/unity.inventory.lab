@@ -27,7 +27,7 @@ namespace ToolKid.InventorySystem {
             Action = action;
         }
 
-        public virtual void Invoke(object sender, Slot e) {
+        public void Invoke(object sender, Slot e) {
             onTrigger?.Invoke();
             TriggerEnter?.Invoke(sender, e);
             Action?.Invoke(e);
