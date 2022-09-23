@@ -10,7 +10,7 @@ namespace ToolKid.InventorySystem {
     /// Define the entire data of Item.
     /// </summary>
     [System.Serializable]
-    public class ItemProps {
+    public struct ItemProps {
 
         [SerializeField]
         private string name;
@@ -48,14 +48,16 @@ namespace ToolKid.InventorySystem {
             stackLimit = props.stackLimit;
             price = props.price;
             spriteAddress = props.spriteAddress;
+            tag = props.tag;
         }
-        public ItemProps(Slot slot) {
+        public ItemProps(SlotProps slot) {
             name = slot.Item.name;
             description = slot.Item.description;
             index = slot.Item.index;
             stackLimit = slot.Item.stackLimit;
             price = slot.Item.price;
             spriteAddress = slot.Item.spriteAddress;
+            tag = slot.Item.tag;
         }
 
         public void Clear() {

@@ -3,20 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace ToolKid.InventorySystem {
     public class InventoryKeeper : MonoBehaviour {
-        [SerializeField]
-        private List<Inventory> inventories;
-        public List<Inventory> Inventories {
-            get {
-                return inventories;
-            }
-        }
-        [SerializeField]
-        private List<InventoryBase> inventoryBases;
-        public List<InventoryBase> InventoryBases {
-            get {
-                return inventoryBases;
-            }
-        }
+        [SerializeField] private List<InventoryBase> inventoryBases;
+        [SerializeField] private List<InventoryProps> inventories;
+        public List<InventoryProps> Inventories { get => inventories; }        
+        public List<InventoryBase> InventoryBases { get => inventoryBases; }
 
         public Dictionary<string, InventoryBase> InventoryTable = new Dictionary<string, InventoryBase>();
 
@@ -39,7 +29,7 @@ namespace ToolKid.InventorySystem {
         }
 
         public void OpenInventory(string name) {
-            InventoryTable[name].Disable();
+            InventoryTable[name].Enable(false);
         }
     }
 }

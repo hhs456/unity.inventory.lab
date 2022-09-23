@@ -1402,10 +1402,12 @@ MonoBehaviour:
     defaultSelected: 0
     min: 0
     max: 0
-  defaultEnable: 0
+  slotBases: []
   lastPosition: {x: -201, y: 101}
   hidePosition: {x: 0, y: 1000}
   keyCode: 0
+  defaultEnable: 0
+  hoveringSlot: {fileID: 0}
 --- !u!114 &746725891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1630,10 +1632,12 @@ MonoBehaviour:
     defaultSelected: 0
     min: 0
     max: 0
-  defaultEnable: 0
+  slotBases: []
   lastPosition: {x: 0, y: 0}
   hidePosition: {x: 0, y: 1000}
   keyCode: 105
+  defaultEnable: 0
+  hoveringSlot: {fileID: 0}
 --- !u!114 &805274272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1914,10 +1918,12 @@ MonoBehaviour:
     defaultSelected: 0
     min: 0
     max: 0
-  defaultEnable: 0
+  slotBases: []
   lastPosition: {x: 0, y: 101}
   hidePosition: {x: 0, y: 1000}
   keyCode: 0
+  defaultEnable: 0
+  hoveringSlot: {fileID: 0}
 --- !u!114 &947299342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2932,6 +2938,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2272c250e3b36ce4dabdf64c0a5f23ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventoryBases:
+  - {fileID: 805274271}
+  - {fileID: 947299341}
+  - {fileID: 746725890}
   inventories:
   - name: "\u7269\u54C1\u6B04"
     index: 0
@@ -2951,10 +2961,6 @@ MonoBehaviour:
     defaultSelected: 0
     min: 0
     max: 0
-  inventoryBases:
-  - {fileID: 805274271}
-  - {fileID: 947299341}
-  - {fileID: 746725890}
 --- !u!1001 &1543381639
 PrefabInstance:
   m_ObjectHideFlags: 0

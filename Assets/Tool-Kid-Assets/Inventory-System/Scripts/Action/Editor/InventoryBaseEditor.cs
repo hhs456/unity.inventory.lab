@@ -14,10 +14,10 @@ namespace ToolKid.InventorySystem {
             script = (InventoryBase)target;
             serializedObject.Update();
             if (GUILayout.Button("Enable")) {
-                script.Enable();
+                script.Enable(true);
             }
             if (GUILayout.Button("Disable")) {
-                script.Disable();
+                script.Enable(false);
             }
             serializedObject.ApplyModifiedProperties();
         }

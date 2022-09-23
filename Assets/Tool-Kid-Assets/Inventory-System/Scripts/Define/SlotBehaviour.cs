@@ -6,28 +6,28 @@ using UnityEngine.Events;
 
 namespace ToolKid.InventorySystem {
 
-    public delegate void SlotEventHandler(object sender, Slot e);
+    public delegate void SlotEventHandler(object sender, SlotProps e);
 
     public class SlotEvent {
 
         public event SlotEventHandler Trigger;        
 
-        public void OnTrigger(object sender, Slot e) {
+        public void OnTrigger(object sender, SlotProps e) {
             Trigger?.Invoke(sender, e);
         }
     }
     [Serializable]
     public class SlotEventAction {
 
-        public Action<Slot> Action;
+        public Action<SlotProps> Action;
         public UnityEvent onTrigger;
         public event SlotEventHandler TriggerEnter;
 
-        public SlotEventAction(Action<Slot> action) {
+        public SlotEventAction(Action<SlotProps> action) {
             Action = action;
         }
 
-        public void Invoke(object sender, Slot e) {
+        public void Invoke(object sender, SlotProps e) {
             onTrigger?.Invoke();
             TriggerEnter?.Invoke(sender, e);
             Action?.Invoke(e);
@@ -49,16 +49,16 @@ namespace ToolKid.InventorySystem {
         public SlotEventAction Stay;
         public SlotEventAction Exit;
 
-        public virtual void OnEnter(object sender, Slot e) {
+        public virtual void OnEnter(object sender, SlotProps e) {
             isExcuting = true;
             StartCoroutine(Action(e));
         }
 
-        public virtual void OnExit(object sender, Slot e) {
+        public virtual void OnExit(object sender, SlotProps e) {
             isExcuting = false;
         }
 
-        private IEnumerator Action(Slot e) {
+        private IEnumerator Action(SlotProps e) {
             Enter.onTrigger.Invoke();
             Enter.Invoke(this, e);
             while (isExcuting) {

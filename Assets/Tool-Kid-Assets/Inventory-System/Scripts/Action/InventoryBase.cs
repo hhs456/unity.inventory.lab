@@ -2,49 +2,37 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace ToolKid.InventorySystem {
     public class InventoryBase : MonoBehaviour {
 
         public bool enableLog = false;
-        [SerializeField]
-        private Inventory props = new Inventory();
-        public Inventory Props {
-            get {
-                return props;
-            }
-            set {
-                props = value;
-            }
-        }
-
-        private SlotBase[] slotBases;
+        [SerializeField] private InventoryProps props = new InventoryProps();
+        [SerializeField] private SlotBase[] slotBases;
+        [SerializeField] private Vector2 lastPosition;
+        [SerializeField] private Vector2 hidePosition = new Vector2(0f, 1000f);
+        [SerializeField] private KeyCode keyCode = KeyCode.None;
+        private bool hasInitialized = false;
+        public InventoryProps Props { get => props; set => props = value; }
         public SlotBase[] SlotBases { get => slotBases; }
         public bool defaultEnable = false;
         private bool enable = false;
-        [SerializeField]
-        private Vector2 lastPosition;
-        [SerializeField]
-        private Vector2 hidePosition = new Vector2(0f, 1000f);
-        [SerializeField]
-        private KeyCode keyCode = KeyCode.None;
-        public KeyCode KeyCode {
-            get => keyCode;
-        }
-
-        private bool hasInitialized = false;
+        
+        public KeyCode KeyCode { get => keyCode; }        
         public bool HasInitialized { get => hasInitialized; }
         
         public SlotEvent DescribeAction = new SlotEvent();
         public SlotEvent UndescribeAction = new SlotEvent();
         public SlotEvent AbandonAction = new SlotEvent();
 
+        public SlotBase hoveringSlot;
 
         void Awake() {
             TimerSystem.GameWatch.Main.WatchUpdate += DspUpdate;
             slotBases = transform.GetComponentsInChildren<SlotBase>();
             enable = !defaultEnable;
-            Switch();
+            Enable(!enabled);
             hasInitialized = true;
             TKLog.Log("InventoryBase Init Success!", this, enableLog);
 
@@ -56,11 +44,11 @@ namespace ToolKid.InventorySystem {
 
         private void DspUpdate(object sender, TimerSystem.WatchArgs e) {
             if (Input.GetKeyDown(KeyCode)) {
-                Switch();
+                Enable(!enable);
             }
         }
 
-        public void Switch() {
+        public void Enable(bool next) {
             if (!enable) {
                 transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(lastPosition.x, lastPosition.y);
             }
@@ -68,26 +56,10 @@ namespace ToolKid.InventorySystem {
                 lastPosition = transform.GetComponent<RectTransform>().anchoredPosition;
                 transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(hidePosition.x, hidePosition.y);
             }
-            enable = !enable;
+            enable = next;
             TKLog.Log("InventoryBase 'enable' is " + enable, this, enableLog);
         }
 
-        public void Enable() {
-            if (!enable) {
-                transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(lastPosition.x, lastPosition.y);
-                enable = !enable;
-            }
-            TKLog.Log("InventoryBase 'enable' is " + enable, this, enableLog);
-        }
-
-        public void Disable() {
-            if (enable) {
-                lastPosition = transform.GetComponent<RectTransform>().anchoredPosition;
-                transform.GetComponent<RectTransform>().anchoredPosition = new Vector2(hidePosition.x, hidePosition.y);
-                enable = !enable;
-            }
-            TKLog.Log("InventoryBase 'enable' is " + enable, this, enableLog);
-        }
         /// <summary>
         /// Add a item with given item and count arguments into this inventory.
         /// </summary>
@@ -95,11 +67,9 @@ namespace ToolKid.InventorySystem {
         /// <param name="count">Item count of target</param>
         public void Add(ItemProps item, int count) {
             if (props.TryAdd(item, count, out LinkedList<SlotBase> slots) > 0) {
-                int i = FirstEmptySlotIndex();
-                if (i != -1) {
-                    SlotBases[i].Props.Set(item, count);
-                    props.BuildTableWith(SlotBases[i]);
-                    TKLog.Log("Build " + SlotBases[i].Props.StackCount + " " + SlotBases[i].Props.Item.Index + " into " + SlotBases[i].name, this, enableLog);
+                //int i = FirstEmptySlotIndex();
+                if (Props.TryAddAtEmptyWith(item, count)) {                    
+                    TKLog.Log("Build new node!", this, enableLog);
                 }
                 else {
                     TKLog.Log("Inventory is full!", this, enableLog);
@@ -107,56 +77,54 @@ namespace ToolKid.InventorySystem {
             }
         }
 
-        public void ChangeSlot(SlotBase S1, SlotBase S2) {
-            if (S1.Props.Item.Index != S2.Props.Item.Index) {
-                Slot temp = new Slot(S2.Props, S2.Index);
-                Props.FindNode(S1).Value = S2;
-                Props.FindNode(S2).Value = S1;                
-                S2.ModifyTo(S1.Props);
-                S1.ModifyTo(temp);
-                TKLog.Log("Finish Exchanging", this, enableLog);
+        public void Relocate(SlotBase from, SlotBase to) {
+            if (from.Props.Item.Index != to.Props.Item.Index) {
+                Exchange(from, to);
             }
             else {
                 TKLog.Log("Stack To " + this, this, enableLog);
-                int overStack = S1.Props.Add(S2.Props.StackCount);
+                int overStack = to.Props.Add(from.Props.StackCount);
 
-                if (overStack == S2.Props.StackCount) {
+                if (overStack == from.Props.StackCount) {
                     // exchange slot stack count
-                    S2.Props.StackCount = S1.Props.StackCount;
-                    S1.Props.StackCount = overStack;
+                    from.Props.StackCount = to.Props.StackCount;
+                    to.Props.StackCount = overStack;
                 }
                 else {
                     // calculate drag slot count
-                    S2.Props.StackCount = overStack;
+                    from.Props.StackCount = overStack;
+                    if (from.Props.StackCount == 0) {
+                        Props.BuildTableWith(from);
+                    }
                 }
             }
         }
 
-        public int FirstEmptySlotIndex() {
-            for (int i = 0; i < SlotBases.Length; i++) {
-                if (SlotBases[i].Props.Item.Index == "") {                    
-                    return i;
-                }
-            }
-            return -1;
+        public void Exchange(SlotBase a, SlotBase b) {
+            SlotProps temp = new SlotProps(b.Props, b.Index);
+            Props.FindNode(a).Value = b;
+            Props.FindNode(b).Value = a;
+            b.ModifyTo(a.Props);
+            a.ModifyTo(temp);
+            TKLog.Log("Exchanged " + a + " & " + b, this, enableLog);
         }
 
         #region # Describe Action Callback
-        public void AddDescribeTrigger(SlotBase slot) {            
+        public void AddDescribeTrigger(PointerBehaviour slot) {            
             slot.HoverEventTriggerEnter += DescribeAction.OnTrigger;
             slot.HoverEventTriggerExit += UndescribeAction.OnTrigger;
         }
-        public void RemoveDescribeTrigger(SlotBase slot) {
+        public void RemoveDescribeTrigger(PointerBehaviour slot) {
             slot.HoverEventTriggerEnter -= DescribeAction.OnTrigger;
             slot.HoverEventTriggerExit -= UndescribeAction.OnTrigger;
         }
         #endregion
 
         #region # Abandon Action Callback
-        public void AddAbandonTrigger(SlotBase slot) {
+        public void AddAbandonTrigger(PointerBehaviour slot) {
             slot.Abandon += AbandonAction.OnTrigger;            
         }
-        public void RemoveAbandonTrigger(SlotBase slot) {
+        public void RemoveAbandonTrigger(PointerBehaviour slot) {
             slot.Abandon -= AbandonAction.OnTrigger;
         }
         #endregion

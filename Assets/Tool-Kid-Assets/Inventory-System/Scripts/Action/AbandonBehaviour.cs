@@ -14,7 +14,7 @@ namespace ToolKid.InventorySystem {
 
         public bool enableLog = false;
         public SlotBase lastRelatedSlot;
-        public Slot lastAbandonedTarget;
+        public SlotProps lastAbandonedTarget;
         private InventoryBase Base;
         public SlotEventAction action;
 
@@ -28,15 +28,16 @@ namespace ToolKid.InventorySystem {
             Base.DescribeAction.Trigger -= action.Invoke;            
         }
 
-        public void Action(Slot e) {
+        public void Action(SlotProps e) {
             lastRelatedSlot = Base.transform.GetChild(e.SlotIndex).GetComponent<SlotBase>();
-            lastAbandonedTarget = new Slot(e, new ItemProps(e), e.SlotIndex);
+            lastAbandonedTarget = new SlotProps(e, new ItemProps(e), e.SlotIndex);
             Base.Props.Slots[e.Item.Index].Remove(lastRelatedSlot);
             if (Base.Props.Slots[e.Item.Index].Count == 0) {
                 Base.Props.Slots.Remove(e.Item.Index);
             }
             lastRelatedSlot.Props.Clear();
-            
+            Base.Props.BuildTableWith(lastRelatedSlot);
+
             TKLog.Log("Abandon " + e.Item.Index + " From " + this, this, enableLog);                     
         }
     }

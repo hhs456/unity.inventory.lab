@@ -31,11 +31,11 @@ namespace ToolKid.InventorySystem {
             Base.UndescribeAction.Trigger -= OnExit;
         }
 
-        private void Follow(Slot e) {
+        private void Follow(SlotProps e) {
             informationPanel.position = Input.mousePosition;
         }
 
-        private void Enable(Slot e) {            
+        private void Enable(SlotProps e) {            
             informationPanel.position = Input.mousePosition;
             description.text = e.Item.Description;
             count.text = e.StackCount.ToString("000");
@@ -44,7 +44,7 @@ namespace ToolKid.InventorySystem {
             TKLog.Log("Describe " + e.Item.Index, this, enableLog);            
         }
 
-        private void Unable(Slot e) {            
+        private void Unable(SlotProps e) {            
             informationPanel.position = Input.mousePosition;
             description.text = "It is expect on undescribe";
             informationPanel.gameObject.SetActive(IsExcuting);            
