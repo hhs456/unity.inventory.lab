@@ -8,6 +8,8 @@ namespace ToolKid.TimerSystem {
     [System.Serializable]
     public class WatchArgs : IWatchSystem {
         [SerializeField]
+        protected string name;
+        [SerializeField]
         protected double startTime;
         [SerializeField]
         protected double playTime;
@@ -52,21 +54,20 @@ namespace ToolKid.TimerSystem {
 
         public event EventHandler<EventArgs> Begin;
 
-        public virtual void Reset(object sender) {
-            Start(sender);
-        }
-
         public virtual void Start(object sender) {
             startTime = AudioSettings.dspTime;
             Begin?.Invoke(sender, new EventArgs());
         }
-
-        public virtual void SetPauseTimeOf(PauseState state) {
+        /// <summary>
+        /// Call method while scene's pause event is trigger. 
+        /// </summary>
+        /// <param name="state"></param>
+        public virtual void OnPause(ActionState state) {
             switch (state) {
-                case PauseState.Begin:
+                case ActionState.Begin:
                     pauseBeginTime = AudioSettings.dspTime;
                     break;
-                case PauseState.End:
+                case ActionState.End:
                     pauseEndTime = AudioSettings.dspTime;
                     pauesTime += pauseEndTime - pauseBeginTime;
                     break;
@@ -80,9 +81,13 @@ namespace ToolKid.TimerSystem {
     /// Main timer of scene.
     /// </summary>
     [System.Serializable]
-    public class MainWatch : WatchArgs {
-
+    public class MainWatch : WatchArgs {        
         public event EventHandler<WatchArgs> WatchUpdate;
+
+        public void Start(UnityEngine.Object sender) {
+            name = "Main";
+            base.Start(sender);
+        }
 
         public MainWatch Update(object sender) {
             playTime = AudioSettings.dspTime - startTime - pauesTime;
@@ -93,12 +98,12 @@ namespace ToolKid.TimerSystem {
             return this;
         }
 
-        public override void SetPauseTimeOf(PauseState state) {
+        public override void OnPause(ActionState state) {
             switch (state) {
-                case PauseState.Begin:
+                case ActionState.Begin:
                     pauseBeginTime = AudioSettings.dspTime;
                     break;
-                case PauseState.End:
+                case ActionState.End:
                     pauseEndTime = AudioSettings.dspTime;
                     pauesTime += pauseEndTime - pauseBeginTime;
                     break;
@@ -112,26 +117,32 @@ namespace ToolKid.TimerSystem {
     /// </summary>
     [System.Serializable]
     public class Timer : WatchArgs {
-
         [SerializeField]
         protected double triggerTime;
         
         public event EventHandler<WatchArgs> Trigger;
 
-        public override void Reset(object sender) {
+        public Timer(string name, double triggerTime) {
+            this.name = name;
+            this.triggerTime = triggerTime;
+        }
+
+        public void Start(UnityEngine.Object sender) {
             playTime = 0;
-            base.Reset(sender);
+            base.Start(sender);
+            GameWatch.Main.WatchUpdate += Update;
         }
 
         public override void Start(object sender) {
             base.Start(sender);
-            ((MainWatch)sender).WatchUpdate += Update;
+            GameWatch.Main.WatchUpdate += Update;
         }
 
         private void Update(object sender, WatchArgs e) {
+            playTime = AudioSettings.dspTime - startTime - pauesTime;
             if (playTime >= triggerTime) {
                 Trigger?.Invoke(this, e);
-                ((MainWatch)sender).WatchUpdate -= Update;
+                GameWatch.Main.WatchUpdate -= Update;
             }
         }
     }
@@ -142,13 +153,12 @@ namespace ToolKid.TimerSystem {
         public int Second { get; }
         public int Millisecond { get; }
         public double PauesTime { get; }
-
-        public void Reset(object sender);
+        
         public void Start(object sender);        
-        public void SetPauseTimeOf(PauseState state);
+        public void OnPause(ActionState state);
     }
 
-    public enum PauseState {
+    public enum ActionState {
         Begin, End
     }
 

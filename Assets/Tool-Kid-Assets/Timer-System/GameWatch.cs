@@ -31,15 +31,29 @@ namespace ToolKid.TimerSystem {
         protected void Begin() {
             isStart = true;
             isPause = false;
-            main.Reset(this);
+            main.Start(this);            
+            eventWatches.Add(new Timer("After Abundon 10 sec" ,10d));
+            eventWatches[0].Trigger += TriggerTest;
+            eventWatches[1].Trigger += TriggerBackTest;
+        }
+
+        public void StartFromUnityEvent(int index) {
+            eventWatches[index].Start(this);
+        }
+
+        private void TriggerTest(object sender, WatchArgs e) {
+            eventWatches[1].Start(this);
+        }
+        private void TriggerBackTest(object sender, WatchArgs e) {
+            eventWatches[0].Start(this);
         }
 
         public void OnPause(object sender, bool isPause) {
             if (isPause) {
-                main.SetPauseTimeOf(PauseState.Begin);
+                main.OnPause(ActionState.Begin);
             }
             else {
-                main.SetPauseTimeOf(PauseState.End);
+                main.OnPause(ActionState.End);
             }
             this.isPause = isPause;
             Pause?.Invoke(sender, isPause);

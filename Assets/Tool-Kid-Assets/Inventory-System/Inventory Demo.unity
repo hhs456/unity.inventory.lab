@@ -1721,7 +1721,19 @@ MonoBehaviour:
   action:
     onTrigger:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 1014653327}
+          m_TargetAssemblyTypeName: ToolKid.TimerSystem.GameWatch, Assembly-CSharp
+          m_MethodName: StartFromUnityEvent
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1001 &815956732
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2194,6 +2206,7 @@ MonoBehaviour:
   enableLog: 0
   display: {fileID: 0}
   mainWatch:
+    name: 
     startTime: 0
     playTime: 0
     minute: 0
@@ -2203,7 +2216,8 @@ MonoBehaviour:
     pauseBeginTime: 0
     pauseEndTime: 0
   eventWatches:
-  - startTime: 0
+  - name: While Abundon Trigger
+    startTime: 0
     playTime: 0
     minute: 0
     second: 0
@@ -2211,7 +2225,7 @@ MonoBehaviour:
     pauesTime: 0
     pauseBeginTime: 0
     pauseEndTime: 0
-    triggerTime: 0
+    triggerTime: 10
 --- !u!4 &1014653328
 Transform:
   m_ObjectHideFlags: 0
