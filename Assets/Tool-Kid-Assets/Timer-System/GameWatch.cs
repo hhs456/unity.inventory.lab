@@ -32,9 +32,9 @@ namespace ToolKid.TimerSystem {
             isStart = true;
             isPause = false;
             main.Start(this);            
-            eventWatches.Add(new Timer("After Abundon 10 sec" ,10d));
-            eventWatches[0].Trigger += TriggerTest;
-            eventWatches[1].Trigger += TriggerBackTest;
+            //eventWatches.Add(new Timer("After Abundon 10 sec" ,10d));
+            //eventWatches[0].Trigger += TriggerTest;
+            //eventWatches[1].Trigger += TriggerBackTest;
         }
 
         public void StartFromUnityEvent(int index) {
