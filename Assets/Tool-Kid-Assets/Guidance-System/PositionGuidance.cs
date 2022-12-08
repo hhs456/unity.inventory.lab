@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using ToolKid.TimerSystem;
 using UnityEngine;
@@ -34,6 +34,7 @@ namespace ToolKid.GuidanceSystem {
         private Vector3 cameraAngle = new Vector3();
 
         public Vector2 screenPosition;
+        public Vector2 originPosition;
 
         public Camera customCamera;
         public Transform customTarget;
@@ -59,9 +60,10 @@ namespace ToolKid.GuidanceSystem {
         }
 
         private void DspUpdate(object sender, WatchArgs e) {
-            //Vector2 pos = target.transform.position;  // get the game object position
-            //Vector2 s = Camera.main.WorldToViewportPoint(pos);  //convert game object position to VievportPoint
-            //screenPosition = new Vector2((s.x - 0.5f) * Screen.height, (s.y - 0.5f) * Screen.width);
+            Vector2 pos = target.transform.position;  // get the game object position
+            Vector2 s = Camera.main.WorldToViewportPoint(pos);  //convert game object position to VievportPoint
+            originPosition = new Vector2((s.x - 0.5f) * Screen.height, (s.y - 0.5f) * Screen.width);
+            screenPosition = originPosition;
             //set MIN and MAX Anchor values(positions) to the same position(ViewportPoint)
             //rectTransform.anchorMin = viewportPoint;
             //rectTransform.anchorMax = viewportPoint;
@@ -69,46 +71,57 @@ namespace ToolKid.GuidanceSystem {
             distance = GetDistance(target.position, cam.transform.position);
             distanceText.text = distance.ToString("0.00 m");
 
-            float fieldOfView_comp = Mathf.Cos(cam.fieldOfView / 2f * Mathf.PI / 180f);            
-            if (disableComp) {
-                fieldOfView_comp = 1;
-            }
-            // Vector from camera to target
-            Vector3 base_on_cam = target.transform.position - cam.transform.position;
+            //float fieldOfView_comp = Mathf.Cos(cam.fieldOfView / 2f * Mathf.PI / 180f);            
+            //if (disableComp) {
+            //    fieldOfView_comp = 1;
+            //}
+            //// Vector from camera to target
+            //Vector3 base_on_cam = target.transform.position - cam.transform.position;
 
-            #region # Rotation compensating
-            Vector3 ref_y = new Vector3(0f, 1f, 0f);
-            rotationAngle = (Mathf.Asin(ref_y.x) - Mathf.Asin(cam.transform.up.x)) * 180f / Mathf.PI;
-            float c_rad = rotationAngle * 180f / Mathf.PI;
-            #endregion
+            //#region # Rotation compensating
+            //Vector3 ref_x = TransformPoint(target.position, cam.transform.position, cam.transform.forward) - cam.transform.position;
+            ////rotationAngle = (Mathf.Asin(ref_x.x) - Mathf.Asin(cam.transform.right.x)) * 180f / Mathf.PI;
+            //rotationAngle = Vector3.Angle(ref_x, cam.transform.right) * Mathf.Sign(ref_x.x - cam.transform.right.x);
+            //#endregion
 
-            #region # Horizontal View
-            Vector3 h_tarV3 = new Vector3(base_on_cam.x, 0f, base_on_cam.z);
-            Vector3 h_eyeV3 = new Vector3(cam.transform.forward.x, 0f, cam.transform.forward.z);
-            angle = GetAngle(h_eyeV3, h_tarV3);
+            //#region # Horizontal View
+            //Vector3 h_tarV3 = new Vector3(base_on_cam.x, 0f, base_on_cam.z);
+            //Vector3 h_eyeV3 = new Vector3(cam.transform.forward.x, 0f, cam.transform.forward.z);
+            //angle = GetAngle(h_eyeV3, h_tarV3);
 
-            float h_rad = (angle - 90) * Mathf.PI / 180f;
-            float cos = Mathf.Cos(h_rad);
-            float temp_x = cos * Screen.width * fieldOfView_comp * fieldOfView_comp;
-            screenPosition.x = temp_x;
-            if (Mathf.Abs(temp_x) > Screen.width * 0.4f) {
-                screenPosition.x = Mathf.Sign(angle) * Screen.width * 0.4f;
-            }
-            #endregion
+            //float h_rad = (angle - 90) * Mathf.PI / 180f;
+            //float cos = Mathf.Cos(h_rad);
+            //float temp_x = cos * Screen.width * fieldOfView_comp * fieldOfView_comp;
+            //screenPosition.x = temp_x;
 
-            #region # Vertical View
-            Vector3 tarV3 = new Vector3(base_on_cam.x, base_on_cam.y, base_on_cam.z).normalized;
-            //ensure vector is a magnitude of 1
-            elevationAngle = (Mathf.Asin(tarV3.y) - Mathf.Asin(cam.transform.forward.y)) * 180f / Mathf.PI;
+            //#endregion
 
-            float v_rad = (elevationAngle) * Mathf.PI / 180f;
-            float sin = Mathf.Sin(v_rad);
-            float temp_y = sin * Screen.height * fieldOfView_comp * Mathf.Sqrt(fieldOfView_comp);
-            screenPosition.y = temp_y;
-            if (Mathf.Abs(temp_y) > Screen.height * 0.4f) {
-                screenPosition.y = Mathf.Sign(elevationAngle) * Screen.height * 0.4f;
-            }
-            #endregion
+            //#region # Vertical View
+            //Vector3 tarV3 = new Vector3(base_on_cam.x, base_on_cam.y, base_on_cam.z).normalized;
+            ////ensure vector is a magnitude of 1
+            //elevationAngle = (Mathf.Asin(tarV3.y) - Mathf.Asin(cam.transform.forward.y)) * 180f / Mathf.PI;
+
+            //float v_rad = (elevationAngle) * Mathf.PI / 180f;
+            //float sin = Mathf.Sin(v_rad);
+            //float temp_y = sin * Screen.height * fieldOfView_comp * Mathf.Sqrt(fieldOfView_comp);
+            //screenPosition.y = temp_y;
+
+            //#endregion
+
+            ////rotationAngle = GetAngle(ref_o, new Vector3(temp_x, temp_y, 0f));
+            //float c_rad = rotationAngle * Mathf.PI / 180f;
+            //float final_x = Mathf.Sqrt(temp_x * temp_x + temp_y * temp_y) * Mathf.Cos(c_rad);
+            //screenPosition.x = final_x;
+            //float final_y = Mathf.Sqrt(temp_x * temp_x + temp_y * temp_y) * Mathf.Sin(c_rad);
+            //screenPosition.y = final_y;
+
+            //if (Mathf.Abs(temp_x) > Screen.width * 0.4f) {
+            //    screenPosition.x = Mathf.Sign(angle) * Screen.width * 0.4f;
+            //}
+
+            //if (Mathf.Abs(temp_y) > Screen.height * 0.4f) {
+            //    screenPosition.y = Mathf.Sign(elevationAngle) * Screen.height * 0.4f;
+            //}
 
             //Vector3 camera_near_plane = cam.transform.position + canvas.planeDistance * cam.transform.forward;
             //shadowPoint = TransformPoint(target.position, camera_near_plane, cam.transform.forward);
@@ -117,7 +130,15 @@ namespace ToolKid.GuidanceSystem {
 
             //Point.position = shadowPoint;
 
-            arrow.gameObject.GetComponent<Image>().enabled = !((Mathf.Abs(temp_y) < Screen.height * 0.42f) && (Mathf.Abs(temp_x) < Screen.width * 0.42f));
+            //arrow.gameObject.GetComponent<Image>().enabled = !((Mathf.Abs(temp_y) < Screen.height * 0.42f) && (Mathf.Abs(temp_x) < Screen.width * 0.42f));
+
+            if (Mathf.Abs(originPosition.x) > Screen.width * 0.4f) {
+                screenPosition.x = Mathf.Sign(Vector3.Dot(cam.transform.forward, target.position - cam.transform.position)) * Screen.width * 0.4f;
+            }
+
+            if (Mathf.Abs(originPosition.y) > Screen.height * 0.4f) {
+                screenPosition.y = Mathf.Sign(Vector3.Dot(cam.transform.forward, target.position - cam.transform.position)) * Screen.height * 0.4f;
+            }
 
             t1 += 1f * Time.deltaTime;
             arrow.anchoredPosition = Vector2.Lerp(arrow.anchoredPosition, screenPosition, t1);            

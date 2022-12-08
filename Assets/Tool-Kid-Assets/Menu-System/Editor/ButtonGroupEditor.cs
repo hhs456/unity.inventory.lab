@@ -38,7 +38,7 @@ public class ButtonGroupEditor : Editor {
 
         serializedObject.Update();
         script = (ButtonGroup)target;
-        Inspector.ScriptHint(this, script, false);
+        InspectorUtility.ScriptHint(this, script, false);
 
         EditorGUILayout.BeginHorizontal();
         ToggleDrawer();
@@ -66,14 +66,14 @@ public class ButtonGroupEditor : Editor {
         drapArea[foId].width = w;
         string label = "按鍵欄位";
         string tooltip = "";
-        Inspector.DoLayoutList(ref foldout[foId], ref list[foId], drapArea[foId], label, tooltip);
+        InspectorUtility.DoLayoutList(ref foldout[foId], ref list[foId], drapArea[foId], label, tooltip);
         prop[foId + 1].arraySize = prop[foId].arraySize;
         float sec_h = foldout[foId] ? fst_h + list[foId].GetHeight() : fst_h;
         foId++;
         drapArea[foId] = new Rect(leftBound, sec_h + h, w, h);
         label = "按鍵風格";
         tooltip = "";
-        Inspector.DoLayoutList(ref foldout[foId], ref list[foId], drapArea[foId], label, tooltip);        
+        InspectorUtility.DoLayoutList(ref foldout[foId], ref list[foId], drapArea[foId], label, tooltip);        
    
         float trd_h = foldout[foId] ? sec_h + list[foId].GetHeight() : sec_h;
         foId++;
@@ -81,7 +81,7 @@ public class ButtonGroupEditor : Editor {
         
         label = "頁面設定";
         tooltip = "";        
-        Inspector.DoLayoutList(ref foldout[foId], ref list[foId], drapArea[foId], label, tooltip);        
+        InspectorUtility.DoLayoutList(ref foldout[foId], ref list[foId], drapArea[foId], label, tooltip);        
     }
     
 }

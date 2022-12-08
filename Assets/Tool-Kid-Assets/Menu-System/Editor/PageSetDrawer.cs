@@ -76,11 +76,11 @@ public class PageSetDrawer : PropertyDrawer
                     rect = new Rect(position.x, position.y += singleHeight, position.width, singleHeight);
                     EditorGUI.PropertyField(rect, property.FindPropertyRelative("Base"), new GUIContent("頁面基底"));
                     rect = new Rect(position.x, position.y += singleHeight * 1.25f, position.width, singleHeight);                    
-                    property.FindPropertyRelative("compensation").floatValue += Inspector.GUIList(ref stylesSet.getList[listId], stylesSet.getProperty[listId], rect, new GUIContent("風格"));                    
+                    property.FindPropertyRelative("compensation").floatValue += InspectorUtility.GUIList(ref stylesSet.getList[listId], stylesSet.getProperty[listId], rect, new GUIContent("風格"));                    
                 }
                 else {                    
                     rect = new Rect(position.x, position.y += singleHeight * 1.25f + property.FindPropertyRelative("compensation").floatValue, position.width, singleHeight);
-                    property.FindPropertyRelative("compensation").floatValue += Inspector.GUIList(ref objectsSet.getList[listId], objectsSet.getProperty[listId], rect, new GUIContent("物件"));
+                    property.FindPropertyRelative("compensation").floatValue += InspectorUtility.GUIList(ref objectsSet.getList[listId], objectsSet.getProperty[listId], rect, new GUIContent("物件"));
                     property.FindPropertyRelative("compensation").floatValue -= EditorGUIUtility.singleLineHeight;
                 }
                 #endregion

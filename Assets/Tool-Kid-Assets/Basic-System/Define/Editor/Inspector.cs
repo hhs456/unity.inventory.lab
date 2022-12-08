@@ -5,14 +5,14 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-public static class Inspector {
+public static class InspectorUtility {
     
     public static Rect DropArea = new Rect();
 
-    public static void ScriptHint(Editor editor ,MonoBehaviour script, bool inheritBase) {
+    public static void ScriptHint(Editor editor, MonoBehaviour script, bool inheritBase) {
         EditorGUI.BeginDisabledGroup(true);
         EditorGUILayout.ObjectField("Editor", MonoScript.FromScriptableObject(editor), script.GetType(), true);
-        if(!inheritBase)
+        if (!inheritBase)
             EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour(script), script.GetType(), true);
         EditorGUI.EndDisabledGroup();
     }

@@ -296,7 +296,6 @@ GameObject:
   - component: {fileID: 745273793}
   - component: {fileID: 745273795}
   - component: {fileID: 745273794}
-  - component: {fileID: 745273796}
   m_Layer: 5
   m_Name: Guidance Image
   m_TagString: Untagged
@@ -311,8 +310,8 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 745273792}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: -0, z: -1, w: -0.00000004371139}
+  m_LocalPosition: {x: 0, y: 0, z: 1818.2205}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1701184997}
@@ -321,7 +320,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 137970.84, y: 64873.176}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &745273794
@@ -337,7 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.29411766, g: 0.29411766, b: 0.29411766, a: 0.6862745}
+  m_Color: {r: 0.39215687, g: 0.39215687, b: 0.39215687, a: 0.6862745}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -362,34 +361,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 745273792}
   m_CullTransparentMesh: 1
---- !u!114 &745273796
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 745273792}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e87da149837c2f547b533b879481dfc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  disableComp: 0
-  Point: {fileID: 1214023985}
-  arrow: {fileID: 745273793}
-  angle: 0
-  elevationAngle: 0
-  rotationAngle: 0
-  distance: 0
-  height: 0
-  cameraAngle: {x: 0, y: 0, z: 0}
-  screenPosition: {x: 0, y: 0}
-  customCamera: {fileID: 1836544520}
-  customTarget: {fileID: 1944186862}
-  customCanvas: {fileID: 966613558}
-  distanceText: {fileID: 1701184998}
-  shadowVector: {x: 0, y: 0}
-  shadowPoint: {x: 0, y: 0, z: 0}
 --- !u!1 &966613555
 GameObject:
   m_ObjectHideFlags: 0
@@ -402,6 +373,7 @@ GameObject:
   - component: {fileID: 966613558}
   - component: {fileID: 966613557}
   - component: {fileID: 966613556}
+  - component: {fileID: 966613560}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -490,6 +462,25 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &966613560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966613555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bec7f3306f62114285f09f6df21b98a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cam: {fileID: 1836544521}
+  arrow: {fileID: 745273793}
+  target: {fileID: 1944186862}
+  direction: 0
+  normal: {x: 0, y: 0, z: 0}
+  boundaryDistance: 60
+  screenPosition: {x: 0, y: 0}
 --- !u!1 &1214023984
 GameObject:
   m_ObjectHideFlags: 0
@@ -655,7 +646,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: 
 --- !u!222 &1701184999
 CanvasRenderer:
   m_ObjectHideFlags: 0
