@@ -31,7 +31,7 @@ public class ButtonGroupEditor : Editor {
         foId++;
         prop[foId] = serializedObject.FindProperty("pageSettings");
         list[foId] = new ReorderableList(serializedObject, prop[foId], true, false, true, true);
-        list[foId].DrawClassDataList(prop[foId], "", "", true);
+        list[foId].DrawClassDataList(prop[foId], "頁面", "", true);
     }
 
     public override void OnInspectorGUI() {
@@ -66,22 +66,22 @@ public class ButtonGroupEditor : Editor {
         drapArea[foId].width = w;
         string label = "按鍵欄位";
         string tooltip = "";
-        InspectorUtility.DoLayoutList(ref foldout[foId], ref list[foId], drapArea[foId], label, tooltip);
+        list[foId].DoLayoutList(label, tooltip);
         prop[foId + 1].arraySize = prop[foId].arraySize;
         float sec_h = foldout[foId] ? fst_h + list[foId].GetHeight() : fst_h;
         foId++;
         drapArea[foId] = new Rect(leftBound, sec_h + h, w, h);
         label = "按鍵風格";
         tooltip = "";
-        InspectorUtility.DoLayoutList(ref foldout[foId], ref list[foId], drapArea[foId], label, tooltip);        
+        list[foId].DoLayoutList(label, tooltip);        
    
         float trd_h = foldout[foId] ? sec_h + list[foId].GetHeight() : sec_h;
         foId++;
         drapArea[foId] = new Rect(leftBound, trd_h + 2 * h, w, h);
         
         label = "頁面設定";
-        tooltip = "";        
-        InspectorUtility.DoLayoutList(ref foldout[foId], ref list[foId], drapArea[foId], label, tooltip);        
+        tooltip = "";
+        list[foId].DoLayoutList(label, tooltip);        
     }
     
 }

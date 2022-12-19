@@ -9,6 +9,17 @@ public static class InspectorUtility {
     
     public static Rect DropArea = new Rect();
 
+    public static bool ScriptHint<T>(this Editor editor, bool foldout) {        
+        if (foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, "µ{¦¡½X CSharp")) {
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField("½s¿è Editor", MonoScript.FromScriptableObject(editor), typeof(T), true);
+            EditorGUILayout.ObjectField("±±¨î Script", MonoScript.FromMonoBehaviour(editor.target as MonoBehaviour), typeof(T), true);
+            EditorGUI.EndDisabledGroup();
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+        return foldout;
+    }
+
     public static void ScriptHint(Editor editor, MonoBehaviour script, bool inheritBase) {
         EditorGUI.BeginDisabledGroup(true);
         EditorGUILayout.ObjectField("Editor", MonoScript.FromScriptableObject(editor), script.GetType(), true);
@@ -24,13 +35,23 @@ public static class InspectorUtility {
         EditorGUI.EndDisabledGroup();
     }
 
-    public static void DoLayoutList(ref bool foldout, ref ReorderableList list, Rect drapArea, string label, string tooltip) {
-        if (GUI.Button(drapArea, "")) {
-            foldout = !foldout;
-        }
-        DropAreaGUI(ref list, drapArea, Event.current);
-        if (EditorGUILayout.Foldout(foldout, new GUIContent(label, tooltip))) {            
+    public static void DoLayoutList(this ReorderableList list, string label, string tooltip) {
+        EditorGUILayout.Space(0f);
+        Rect rect = GUILayoutUtility.GetLastRect();
+        float size_w = EditorGUIUtility.fieldWidth; // default 48f
+        rect.width = rect.width - size_w + 8f;
+        rect.height = EditorGUIUtility.singleLineHeight;
+        DropAreaGUI(ref list, rect, Event.current);
+        list.serializedProperty.isExpanded = EditorGUI.BeginFoldoutHeaderGroup(rect, list.serializedProperty.isExpanded, new GUIContent(label, tooltip));
+        EditorGUILayout.EndFoldoutHeaderGroup();
+        rect.x += rect.width - 8f;
+        rect.width = size_w;
+        list.serializedProperty.arraySize = EditorGUI.IntField(rect, list.serializedProperty.arraySize);
+        rect.y += EditorGUIUtility.singleLineHeight + 2f;                
+        EditorGUILayout.Space(rect.y);
+        if (list.serializedProperty.isExpanded) {            
             list.DoLayoutList();
+            EditorGUILayout.Space(2f);
         }
     }
 
@@ -50,7 +71,7 @@ public static class InspectorUtility {
     public static void DrawPropertyDataList(this ReorderableList list, SerializedProperty props, string label, string tooltip) {                  
         list.drawElementCallback = (rect, index, isActive, isFocused) => {
             Rect arect = rect;            
-            arect.y = rect.y + 2.45f;
+            arect.y = rect.y + 1f;
             arect.height = list.elementHeight;
             EditorGUI.LabelField(arect, new GUIContent(label + " " + index, tooltip));
             arect.x = rect.x + 48;
@@ -63,26 +84,12 @@ public static class InspectorUtility {
         reorderableList.drawElementCallback = (rect, index, isActive, isFocused) => {
             Rect arect = rect;
             arect.y = rect.y + 2.45f;
-            arect.height = reorderableList.elementHeight;
+            arect.height = EditorGUI.GetPropertyHeight(reorderableList.serializedProperty.GetArrayElementAtIndex(index));
             arect.x = rect.x + 12;
             arect.width = rect.width - rect.width / 10;
-            EditorGUI.PropertyField(arect, props.GetArrayElementAtIndex(index), new GUIContent("", tooltip));
+            EditorGUI.PropertyField(arect, reorderableList.serializedProperty.GetArrayElementAtIndex(index), true);
         };
-        reorderableList.elementHeightCallback = (index) => EditorGUI.GetPropertyHeight(props.GetArrayElementAtIndex(index));
-        reorderableList.onAddCallback = (list) => {
-            props.arraySize++;
-            props.GetArrayElementAtIndex(props.arraySize - 1).FindPropertyRelative("enable").boolValue = false;
-            props.GetArrayElementAtIndex(props.arraySize - 1).FindPropertyRelative("index").intValue = props.arraySize - 1;
-        };
-        reorderableList.onRemoveCallback = (list) => {
-            int index = list.index;
-            list.serializedProperty.DeleteArrayElementAtIndex(index);
-            int i_size = list.count;
-            for (int i = index; i < i_size; i++) {
-                list.serializedProperty.GetArrayElementAtIndex(i).FindPropertyRelative("index").intValue = i;
-                list.serializedProperty.GetArrayElementAtIndex(i).FindPropertyRelative("enable").boolValue = false;
-            }
-        };
+        reorderableList.elementHeightCallback = (index) => EditorGUI.GetPropertyHeight(props.GetArrayElementAtIndex(index));                
     }
 
     public static void DropAreaGUI(ref SerializedProperty list, Rect drop_area, params string[] propertiesName) {
@@ -104,6 +111,26 @@ public static class InspectorUtility {
         }
     }
 
+    public static void OnDrop<T>(this Rect drop_area, Event operating, Predicate<T> match, Action<T> action) {
+        switch (operating.type) {
+            case EventType.DragUpdated:
+            case EventType.DragPerform:
+                if (drop_area.Contains(operating.mousePosition)) {
+                    DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                    if (operating.type == EventType.DragPerform) {
+                        DragAndDrop.AcceptDrag();
+                        T[] ts = DragAndDrop.objectReferences as T[];
+                        Array.ForEach(ts, t => {
+                            if (match(t)) {
+                                action.Invoke(t);
+                            }
+                        });
+                    }
+                }
+                break;
+        }
+    }
+
     public static void DropAreaGUI(ref ReorderableList list, Rect drop_area, Event operating) {
         switch (operating.type) {
             case EventType.DragUpdated:
@@ -113,10 +140,10 @@ public static class InspectorUtility {
                 DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
                 if (operating.type == EventType.DragPerform) {
                     DragAndDrop.AcceptDrag();
-                    foreach (UnityEngine.Object dragged_object in DragAndDrop.objectReferences) {
-                        Debug.Log(list.list);
-                        list.serializedProperty.arraySize++;
-                        list.serializedProperty.GetArrayElementAtIndex(list.count - 1).objectReferenceValue = dragged_object;
+                    foreach (UnityEngine.Object dragged_object in DragAndDrop.objectReferences) {                        
+                        int final = list.count - 1;
+                        list.serializedProperty.InsertArrayElementAtIndex(final);                        
+                        list.serializedProperty.GetArrayElementAtIndex(final + 1).objectReferenceValue = dragged_object;
                     }
                 }
                 break;

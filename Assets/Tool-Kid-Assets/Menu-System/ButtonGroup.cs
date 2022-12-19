@@ -9,7 +9,7 @@ public enum PageType {
 }
 
 [System.Serializable]
-public class PageSet : GUIListArgs {
+public class PageSet {
     public string description;
     public bool changeObject;
     public GameObject Base;
@@ -17,11 +17,11 @@ public class PageSet : GUIListArgs {
     public List<GameObject> objects;
 
     public PageSet() {
-        enable = false;
+        //enable = false;
     }
 
     public PageSet(string name, GameObject target) {
-        enable = false;
+        //enable = false;
         description = name;
         Base = target;
     }
