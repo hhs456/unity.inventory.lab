@@ -6,14 +6,17 @@ using UnityEditorInternal;
 using UnityEngine;
 
 public static class InspectorUtility {
-    
+
+    public static readonly float space = 2f;
+    public static readonly float width = EditorGUIUtility.currentViewWidth;
     public static Rect DropArea = new Rect();
 
-    public static bool ScriptHint<T>(this Editor editor, bool foldout) {        
+    public static bool ScriptHint(this Editor editor, bool foldout) {
+        float w = GUILayoutUtility.GetLastRect().width;
         if (foldout = EditorGUILayout.BeginFoldoutHeaderGroup(foldout, "程式碼 CSharp")) {
             EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.ObjectField("編輯 Editor", MonoScript.FromScriptableObject(editor), typeof(T), true);
-            EditorGUILayout.ObjectField("控制 Script", MonoScript.FromMonoBehaviour(editor.target as MonoBehaviour), typeof(T), true);
+            EditorGUILayout.ObjectField("編輯 GUI Editor", MonoScript.FromScriptableObject(editor), typeof(Editor), true);
+            EditorGUILayout.ObjectField("控制 Behaviour", MonoScript.FromMonoBehaviour(editor.target as MonoBehaviour), typeof(Editor), true);
             EditorGUI.EndDisabledGroup();
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
@@ -23,8 +26,9 @@ public static class InspectorUtility {
     public static void ScriptHint(Editor editor, MonoBehaviour script, bool inheritBase) {
         EditorGUI.BeginDisabledGroup(true);
         EditorGUILayout.ObjectField("Editor", MonoScript.FromScriptableObject(editor), script.GetType(), true);
-        if (!inheritBase)
+        if (!inheritBase) {
             EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour(script), script.GetType(), true);
+        }
         EditorGUI.EndDisabledGroup();
     }
     public static void ScriptHint(Editor editor, ScriptableObject script, bool inheritBase) {

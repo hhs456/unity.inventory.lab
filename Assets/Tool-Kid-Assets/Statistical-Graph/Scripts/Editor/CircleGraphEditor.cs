@@ -12,14 +12,14 @@ namespace ToolKid {
         bool foldout = true;
 
         void OnEnable() {
-
+            
         }
 
         public override void OnInspectorGUI() {
-
-            serializedObject.Update();
             
-            foldout = this.ScriptHint<CircleGraph>(foldout);
+            serializedObject.Update();
+            EditorGUILayout.Space(0);
+            foldout = this.ScriptHint(foldout);                        
             EditorGUILayout.PropertyField(serializedObject.FindProperty("style"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("distanceFromCenter"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("sliceValues"), new GUIContent("�ƾڮw Data"));
