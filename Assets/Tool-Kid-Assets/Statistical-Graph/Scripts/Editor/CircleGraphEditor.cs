@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
-namespace ToolKid {
+namespace ToolKid.EditorExtension {
 
     [CustomEditor(typeof(CircleGraph))]
     public class CircleGraphEditor : BaseEditor {
