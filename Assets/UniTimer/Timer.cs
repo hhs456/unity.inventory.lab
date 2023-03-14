@@ -60,5 +60,19 @@ namespace ToolKid {
             // 計時器運行結束
             isRunning = false;
         }
+
+        public void Pause() {
+            if (!isRunning) return;
+            isRunning = false;
+            // 取消迴圈中的 await UniTask.Delay()，暫停計時器
+            cts.Cancel();
+        }
+
+        public void Resume() {
+            if (isRunning) return;
+            isRunning = true;
+            // 重新開始執行計時器的迴圈
+            _ = TimerLoop();
+        }
     }
 }
